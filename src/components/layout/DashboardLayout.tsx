@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -12,7 +11,8 @@ import {
   AlertTriangle,
   Menu,
   X,
-  Plus
+  Plus,
+  Route
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -25,7 +25,7 @@ const DashboardLayout = () => {
   const navigationItems = [
     { path: '/dashboard', label: 'Dashboard', icon: BarChart3 },
     { path: '/employees', label: 'Employees', icon: Users },
-    { path: '/ride-requests', label: 'Ride Requests', icon: Calendar, badge: '3' },
+    { path: '/routing', label: 'Smart Routing', icon: Route },
     { path: '/special-rides', label: 'Special Rides', icon: Plus },
     { path: '/cancellations', label: 'Cancellations', icon: X },
     { path: '/sos-alerts', label: 'SOS Alerts', icon: AlertTriangle, badge: sosActive ? '1' : undefined },

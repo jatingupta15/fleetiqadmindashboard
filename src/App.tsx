@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,7 +8,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Employees from "./pages/Employees";
 import EmployeeProfile from "./pages/EmployeeProfile";
-import RideRequests from "./pages/RideRequests";
+import Routing from "./pages/Routing";
 import SpecialRides from "./pages/SpecialRides";
 import Cancellations from "./pages/Cancellations";
 import SOSAlerts from "./pages/SOSAlerts";
@@ -56,7 +55,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/employees" element={<Employees />} />
             <Route path="/employee/:id" element={<EmployeeProfile />} />
-            <Route path="/ride-requests" element={<RideRequests />} />
+            <Route path="/routing" element={<Routing />} />
             <Route path="/special-rides" element={<SpecialRides />} />
             <Route path="/cancellations" element={<Cancellations />} />
             <Route path="/sos-alerts" element={<SOSAlerts />} />
