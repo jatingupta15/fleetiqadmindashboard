@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import GoogleLocationPicker from '@/components/GoogleLocationPicker';
 import { 
   Plus, 
   User, 
@@ -51,6 +52,11 @@ const SpecialRides = () => {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleLocationChange = (field: string, value: string, placeDetails?: google.maps.places.PlaceResult) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    console.log('Location selected:', { field, value, placeDetails });
   };
 
   const vehicleTypes = [
@@ -121,26 +127,20 @@ const SpecialRides = () => {
                     Location Details
                   </h3>
                   <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="pickupLocation">Pickup Location *</Label>
-                      <Input
-                        id="pickupLocation"
-                        placeholder="Enter pickup address"
-                        value={formData.pickupLocation}
-                        onChange={(e) => handleInputChange('pickupLocation', e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="dropLocation">Drop Location *</Label>
-                      <Input
-                        id="dropLocation"
-                        placeholder="Enter drop address"
-                        value={formData.dropLocation}
-                        onChange={(e) => handleInputChange('dropLocation', e.target.value)}
-                        required
-                      />
-                    </div>
+                    <GoogleLocationPicker
+                      label="Pickup Location"
+                      placeholder="Search for pickup location..."
+                      value={formData.pickupLocation}
+                      onChange={(value, placeDetails) => handleLocationChange('pickupLocation', value, placeDetails)}
+                      required
+                    />
+                    <GoogleLocationPicker
+                      label="Drop Location"
+                      placeholder="Search for drop location..."
+                      value={formData.dropLocation}
+                      onChange={(value, placeDetails) => handleLocationChange('dropLocation', value, placeDetails)}
+                      required
+                    />
                   </div>
                 </div>
 
@@ -260,6 +260,25 @@ const SpecialRides = () => {
                   <li>• Driver and vehicle assignment is handled by Super Admin</li>
                   <li>• You will receive approval/rejection notification</li>
                 </ul>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Google Maps Integration</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="text-sm font-medium">Enhanced Location Picker</div>
+                  <div className="text-xs text-gray-600">
+                    Search and select precise locations with Google Maps integration
+                  </div>
+                </div>
+                <div className="text-xs text-gray-500">
+                  Requires Google Maps API key for full functionality
+                </div>
               </div>
             </CardContent>
           </Card>
