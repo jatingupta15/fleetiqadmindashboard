@@ -1,30 +1,35 @@
+
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { 
   Plus, 
-  Search, 
-  Filter, 
   Upload, 
-  Download,
-  Eye,
-  Edit,
-  UserX,
-  MoreHorizontal
+  Download
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import AddEmployeeForm from '@/components/AddEmployeeForm';
+import EmployeeTable from '@/components/EmployeeTable';
+import EmployeeFilters from '@/components/EmployeeFilters';
 import { toast } from '@/hooks/use-toast';
+
+interface Employee {
+  id: number;
+  code: string;
+  name: string;
+  designation: string;
+  department: string;
+  shift: string;
+  mobile: string;
+  email: string;
+  address: string;
+  gender: string;
+  status: string;
+}
 
 const Employees = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
   const [showAddForm, setShowAddForm] = useState(false);
-  const navigate = useNavigate();
-
-  const employees = [
+  const [employees, setEmployees] = useState<Employee[]>([
     {
       id: 1,
       code: 'EMP001',
@@ -77,7 +82,7 @@ const Employees = () => {
       gender: 'Female',
       status: 'Active'
     }
-  ];
+  ]);
 
   const departments = ['all', 'IT', 'HR', 'Finance', 'Marketing', 'Operations'];
 
@@ -90,10 +95,49 @@ const Employees = () => {
   });
 
   const handleAddEmployee = (data: any) => {
-    console.log('New employee data:', data);
+    const newEmployee: Employee = {
+      id: employees.length + 1,
+      code: `EMP${String(employees.length + 1).padStart(3, '0')}`,
+      name: data.name,
+      designation: data.designation,
+      department: data.department,
+      shift: data.shift,
+      mobile: data.mobile,
+      email: data.email,
+      address: data.address,
+      gender: data.gender,
+      status: 'Active'
+    };
+    
+    setEmployees([...employees, newEmployee]);
     toast({
       title: "Employee Added",
       description: `${data.name} has been successfully added to the system.`,
+    });
+  };
+
+  const handleEditEmployee = (employee: Employee) => {
+    console.log('Edit employee:', employee);
+    // Here you would typically open an edit form or navigate to edit page
+  };
+
+  const handleDeactivateEmployee = (employee: Employee) => {
+    setEmployees(employees.map(emp => 
+      emp.id === employee.id ? { ...emp, status: 'Inactive' } : emp
+    ));
+  };
+
+  const handleDownloadTemplate = () => {
+    toast({
+      title: "Template Downloaded",
+      description: "Employee template has been downloaded successfully.",
+    });
+  };
+
+  const handleImportCSV = () => {
+    toast({
+      title: "Import CSV",
+      description: "CSV import functionality will be implemented soon.",
     });
   };
 
@@ -106,11 +150,11 @@ const Employees = () => {
           <p className="text-gray-600">Manage employee profiles and ride access</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="flex items-center gap-2">
+          <Button variant="outline" className="flex items-center gap-2" onClick={handleDownloadTemplate}>
             <Download className="w-4 h-4" />
             Template
           </Button>
-          <Button variant="outline" className="flex items-center gap-2">
+          <Button variant="outline" className="flex items-center gap-2" onClick={handleImportCSV}>
             <Upload className="w-4 h-4" />
             Import CSV
           </Button>
@@ -125,119 +169,20 @@ const Employees = () => {
       </div>
 
       {/* Search and Filters */}
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-            {/* Search */}
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input
-                placeholder="Search employees..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            
-            {/* Department Filter */}
-            <select
-              value={selectedDepartment}
-              onChange={(e) => setSelectedDepartment(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              {departments.map(dept => (
-                <option key={dept} value={dept}>
-                  {dept === 'all' ? 'All Departments' : dept}
-                </option>
-              ))}
-            </select>
-            
-            <Button variant="outline" size="sm">
-              <Filter className="w-4 h-4 mr-2" />
-              More Filters
-            </Button>
-          </div>
-        </CardHeader>
-      </Card>
+      <EmployeeFilters
+        searchTerm={searchTerm}
+        selectedDepartment={selectedDepartment}
+        departments={departments}
+        onSearchChange={setSearchTerm}
+        onDepartmentChange={setSelectedDepartment}
+      />
 
       {/* Employee Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Employees ({filteredEmployees.length})</CardTitle>
-          <CardDescription>
-            Complete list of registered employees with ride access
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left p-3 font-medium text-gray-600">Employee</th>
-                  <th className="text-left p-3 font-medium text-gray-600">Department</th>
-                  <th className="text-left p-3 font-medium text-gray-600">Shift</th>
-                  <th className="text-left p-3 font-medium text-gray-600">Contact</th>
-                  <th className="text-left p-3 font-medium text-gray-600">Status</th>
-                  <th className="text-left p-3 font-medium text-gray-600">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredEmployees.map((employee) => (
-                  <tr key={employee.id} className="border-b hover:bg-gray-50 transition-colors">
-                    <td className="p-3">
-                      <div>
-                        <div className="font-medium text-gray-900">{employee.name}</div>
-                        <div className="text-sm text-gray-600">{employee.code} • {employee.designation}</div>
-                      </div>
-                    </td>
-                    <td className="p-3">
-                      <Badge variant="secondary">{employee.department}</Badge>
-                    </td>
-                    <td className="p-3">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        employee.shift === 'Day' ? 'bg-yellow-100 text-yellow-800' : 'bg-purple-100 text-purple-800'
-                      }`}>
-                        {employee.shift}
-                      </span>
-                    </td>
-                    <td className="p-3">
-                      <div className="text-sm">
-                        <div>{employee.mobile}</div>
-                        <div className="text-gray-600">{employee.email}</div>
-                      </div>
-                    </td>
-                    <td className="p-3">
-                      <Badge variant="outline" className="text-green-600 border-green-600">
-                        {employee.status}
-                      </Badge>
-                    </td>
-                    <td className="p-3">
-                      <div className="flex items-center space-x-2">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => navigate(`/employee/${employee.id}`)}
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button size="sm" variant="ghost">
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button size="sm" variant="ghost">
-                          <UserX className="w-4 h-4" />
-                        </Button>
-                        <Button size="sm" variant="ghost">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+      <EmployeeTable
+        employees={filteredEmployees}
+        onEdit={handleEditEmployee}
+        onDeactivate={handleDeactivateEmployee}
+      />
 
       <AddEmployeeForm 
         open={showAddForm}
