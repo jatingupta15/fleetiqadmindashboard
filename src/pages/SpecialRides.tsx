@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -54,7 +53,7 @@ const SpecialRides = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleLocationChange = (field: string, value: string, placeDetails?: google.maps.places.PlaceResult) => {
+  const handleLocationChange = (field: string, value: string, placeDetails?: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     console.log('Location selected:', { field, value, placeDetails });
   };

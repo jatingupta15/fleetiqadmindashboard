@@ -9,7 +9,7 @@ interface GoogleLocationPickerProps {
   label: string;
   placeholder: string;
   value: string;
-  onChange: (value: string, placeDetails?: google.maps.places.PlaceResult) => void;
+  onChange: (value: string, placeDetails?: any) => void;
   required?: boolean;
 }
 
@@ -62,7 +62,7 @@ const GoogleLocationPicker: React.FC<GoogleLocationPickerProps> = ({
 
   useEffect(() => {
     // Try to load Google Maps if not already loaded
-    if (window.google && window.google.maps) {
+    if (typeof window !== 'undefined' && (window as any).google && (window as any).google.maps) {
       setIsGoogleLoaded(true);
       initializeAutocomplete();
       return;
@@ -82,9 +82,10 @@ const GoogleLocationPicker: React.FC<GoogleLocationPickerProps> = ({
   };
 
   const initializeAutocomplete = () => {
-    if (!inputRef.current || !window.google) return;
+    if (!inputRef.current || typeof window === 'undefined' || !(window as any).google) return;
 
-    const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
+    const googleMaps = (window as any).google.maps;
+    const autocomplete = new googleMaps.places.Autocomplete(inputRef.current, {
       types: ['establishment', 'geocode'],
       fields: ['place_id', 'formatted_address', 'name', 'geometry']
     });
