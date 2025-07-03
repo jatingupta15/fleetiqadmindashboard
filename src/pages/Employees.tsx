@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,10 +15,13 @@ import {
   MoreHorizontal
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import AddEmployeeForm from '@/components/AddEmployeeForm';
+import { toast } from '@/hooks/use-toast';
 
 const Employees = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
+  const [showAddForm, setShowAddForm] = useState(false);
   const navigate = useNavigate();
 
   const employees = [
@@ -87,6 +89,14 @@ const Employees = () => {
     return matchesSearch && matchesDepartment;
   });
 
+  const handleAddEmployee = (data: any) => {
+    console.log('New employee data:', data);
+    toast({
+      title: "Employee Added",
+      description: `${data.name} has been successfully added to the system.`,
+    });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -104,7 +114,10 @@ const Employees = () => {
             <Upload className="w-4 h-4" />
             Import CSV
           </Button>
-          <Button className="flex items-center gap-2">
+          <Button 
+            className="flex items-center gap-2"
+            onClick={() => setShowAddForm(true)}
+          >
             <Plus className="w-4 h-4" />
             Add Employee
           </Button>
@@ -225,6 +238,12 @@ const Employees = () => {
           </div>
         </CardContent>
       </Card>
+
+      <AddEmployeeForm 
+        open={showAddForm}
+        onOpenChange={setShowAddForm}
+        onSubmit={handleAddEmployee}
+      />
     </div>
   );
 };
