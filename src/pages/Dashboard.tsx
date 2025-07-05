@@ -11,32 +11,32 @@ import {
   TrendingUp,
   Clock,
   MapPin,
-  Phone
+  Phone,
+  Route
 } from 'lucide-react';
 
 const Dashboard = () => {
   const metrics = [
     { title: 'Total Rides Today', value: '127', change: '+12%', icon: Car, color: 'text-blue-600' },
     { title: 'Active Employees', value: '284', change: '+3%', icon: Users, color: 'text-green-600' },
-    { title: 'Pending Requests', value: '8', change: '-2', icon: Calendar, color: 'text-orange-600' },
+    { title: 'Active Routes', value: '15', change: '+2', icon: Route, color: 'text-orange-600' },
     { title: 'SOS Alerts', value: '1', change: 'Active', icon: AlertTriangle, color: 'text-red-600' },
   ];
 
   const recentActivity = [
-    { id: 1, type: 'Ride Request', employee: 'John Doe', department: 'IT', time: '2 mins ago', status: 'pending' },
-    { id: 2, type: 'Cancellation', employee: 'Sarah Smith', department: 'HR', time: '5 mins ago', status: 'cancelled' },
-    { id: 3, type: 'Special Ride', employee: 'Director Mike', department: 'Executive', time: '10 mins ago', status: 'approved' },
+    { id: 1, type: 'Route Assigned', employee: 'John Doe', department: 'IT', time: '2 mins ago', status: 'active' },
+    { id: 2, type: 'Route Completed', employee: 'Sarah Smith', department: 'HR', time: '5 mins ago', status: 'completed' },
+    { id: 3, type: 'VIP Booking', employee: 'Director Mike', department: 'Executive', time: '10 mins ago', status: 'approved' },
     { id: 4, type: 'SOS Alert', employee: 'Sarah Chen', department: 'Finance', time: '12 mins ago', status: 'active' },
-    { id: 5, type: 'Ride Completed', employee: 'Alex Johnson', department: 'Marketing', time: '15 mins ago', status: 'completed' },
+    { id: 5, type: 'Route Optimized', employee: 'Alex Johnson', department: 'Marketing', time: '15 mins ago', status: 'completed' },
   ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'active': return 'bg-blue-100 text-blue-800';
       case 'approved': return 'bg-green-100 text-green-800';
       case 'cancelled': return 'bg-red-100 text-red-800';
-      case 'active': return 'bg-red-100 text-red-800';
-      case 'completed': return 'bg-blue-100 text-blue-800';
+      case 'completed': return 'bg-green-100 text-green-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -75,7 +75,7 @@ const Dashboard = () => {
             Recent Activity
           </CardTitle>
           <CardDescription>
-            Latest ride requests, cancellations, and alerts
+            Latest routing activities, bookings, and alerts
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -130,11 +130,11 @@ const Dashboard = () => {
               </div>
               
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Cancellation Rate</span>
-                <span className="text-sm font-bold text-red-600">6%</span>
+                <span className="text-sm font-medium">Route Efficiency</span>
+                <span className="text-sm font-bold text-blue-600">87%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-red-600 h-2 rounded-full w-[6%]"></div>
+                <div className="bg-blue-600 h-2 rounded-full w-[87%]"></div>
               </div>
             </div>
           </CardContent>
@@ -142,22 +142,22 @@ const Dashboard = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Department Usage</CardTitle>
+            <CardTitle>Fleet Utilization</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {[
-                { dept: 'IT', rides: 45, color: 'bg-blue-500' },
-                { dept: 'Finance', rides: 32, color: 'bg-green-500' },
-                { dept: 'HR', rides: 28, color: 'bg-purple-500' },
-                { dept: 'Marketing', rides: 22, color: 'bg-orange-500' },
-              ].map((dept) => (
-                <div key={dept.dept} className="flex items-center justify-between">
+                { vehicle: 'Sedan Fleet', usage: 45, color: 'bg-blue-500' },
+                { vehicle: 'SUV Fleet', usage: 32, color: 'bg-green-500' },
+                { vehicle: 'Executive Cars', usage: 28, color: 'bg-purple-500' },
+                { vehicle: 'Minibus Fleet', usage: 22, color: 'bg-orange-500' },
+              ].map((fleet) => (
+                <div key={fleet.vehicle} className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className={`w-3 h-3 rounded-full ${dept.color}`}></div>
-                    <span className="text-sm font-medium">{dept.dept}</span>
+                    <div className={`w-3 h-3 rounded-full ${fleet.color}`}></div>
+                    <span className="text-sm font-medium">{fleet.vehicle}</span>
                   </div>
-                  <span className="text-sm font-bold">{dept.rides} rides</span>
+                  <span className="text-sm font-bold">{fleet.usage}% utilized</span>
                 </div>
               ))}
             </div>
