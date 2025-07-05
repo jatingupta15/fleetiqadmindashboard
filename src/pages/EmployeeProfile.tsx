@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,7 +37,8 @@ const EmployeeProfile = () => {
     gender: 'Male',
     status: 'Active',
     joinDate: '2023-01-15',
-    emergencyContact: '+91 9876543220'
+    emergencyContact: '+91 9876543220',
+    tripType: 'Both'
   };
 
   const routingInfo = {
@@ -221,6 +221,22 @@ const EmployeeProfile = () => {
                   <div>
                     <label className="text-sm font-medium text-gray-600">Shift</label>
                     <div className="text-gray-900">{employee.shift}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Trip Type</label>
+                    <div className="text-gray-900">
+                      <Badge 
+                        className={
+                          employee.tripType === 'Both' 
+                            ? 'bg-green-100 text-green-800' 
+                            : employee.tripType === 'Pickup Only'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-orange-100 text-orange-800'
+                        }
+                      >
+                        {employee.tripType}
+                      </Badge>
+                    </div>
                   </div>
                 </div>
                 <div>
