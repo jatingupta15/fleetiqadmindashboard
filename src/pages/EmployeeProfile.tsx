@@ -15,7 +15,9 @@ import {
   Mail,
   MapPin,
   Clock,
-  AlertTriangle
+  AlertTriangle,
+  Route,
+  Navigation
 } from 'lucide-react';
 
 const EmployeeProfile = () => {
@@ -39,16 +41,76 @@ const EmployeeProfile = () => {
     emergencyContact: '+91 9876543220'
   };
 
-  const rideHistory = [
-    { id: 1, date: '2024-01-15', pickup: 'Sector 62, Noida', drop: 'DLF Cyber City', status: 'Completed', time: '09:15 AM' },
-    { id: 2, date: '2024-01-14', pickup: 'DLF Cyber City', drop: 'Sector 62, Noida', status: 'Completed', time: '06:30 PM' },
-    { id: 3, date: '2024-01-13', pickup: 'Sector 62, Noida', drop: 'DLF Cyber City', status: 'Completed', time: '09:20 AM' },
-    { id: 4, date: '2024-01-12', pickup: 'DLF Cyber City', drop: 'Sector 62, Noida', status: 'Cancelled', time: '06:25 PM' },
-  ];
+  const routingInfo = {
+    currentRoute: 'Noida Sector 62 - Gurgaon Route A',
+    vehicleNumber: 'DL-01-AB-1234',
+    driverName: 'Rajesh Kumar',
+    driverPhone: '+91 9876543210',
+    pickupPoint: 'Sector 62 Metro',
+    dropPoint: 'DLF Cyber City, Gurgaon',
+    departureTime: '08:30 AM',
+    returnTime: '06:30 PM',
+    estimatedDuration: '45 mins',
+    totalDistance: '28 km',
+    seatNumber: 'A-3',
+    routeStatus: 'Active'
+  };
 
-  const requests = [
-    { id: 1, date: '2024-01-10', type: 'Route Change', currentRoute: 'Sector 62 → DLF Cyber City', requestedRoute: 'Sector 62 → Gurgaon Mall', status: 'Approved', reason: 'Medical appointment' },
-    { id: 2, date: '2024-01-08', type: 'Time Change', currentTime: '09:00 AM', requestedTime: '08:30 AM', status: 'Pending', reason: 'Early meeting' },
+  const rideHistory = [
+    { 
+      id: 1, 
+      date: '2024-01-15', 
+      pickup: 'Sector 62 Metro', 
+      drop: 'DLF Cyber City', 
+      status: 'Completed', 
+      departureTime: '08:30 AM',
+      arrivalTime: '09:15 AM',
+      actualDuration: '45 mins',
+      vehicle: 'DL-01-AB-1234',
+      driver: 'Rajesh Kumar',
+      distance: '28 km',
+      onTime: true
+    },
+    { 
+      id: 2, 
+      date: '2024-01-14', 
+      pickup: 'DLF Cyber City', 
+      drop: 'Sector 62 Metro', 
+      status: 'Completed', 
+      departureTime: '06:30 PM',
+      arrivalTime: '07:20 PM',
+      actualDuration: '50 mins',
+      vehicle: 'DL-01-AB-1234',
+      driver: 'Rajesh Kumar',
+      distance: '28 km',
+      onTime: false,
+      delay: '5 mins'
+    },
+    { 
+      id: 3, 
+      date: '2024-01-13', 
+      pickup: 'Sector 62 Metro', 
+      drop: 'DLF Cyber City', 
+      status: 'Completed', 
+      departureTime: '08:30 AM',
+      arrivalTime: '09:10 AM',
+      actualDuration: '40 mins',
+      vehicle: 'DL-01-AB-1234',
+      driver: 'Rajesh Kumar',
+      distance: '28 km',
+      onTime: true
+    },
+    { 
+      id: 4, 
+      date: '2024-01-12', 
+      pickup: 'DLF Cyber City', 
+      drop: 'Sector 62 Metro', 
+      status: 'Cancelled', 
+      departureTime: '06:30 PM',
+      vehicle: 'DL-01-AB-1234',
+      driver: 'Rajesh Kumar',
+      cancelReason: 'Vehicle breakdown'
+    }
   ];
 
   const cancellations = [
@@ -129,7 +191,7 @@ const EmployeeProfile = () => {
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="details">Details</TabsTrigger>
           <TabsTrigger value="history">Ride History</TabsTrigger>
-          <TabsTrigger value="requests">Requests</TabsTrigger>
+          <TabsTrigger value="routing">Routing</TabsTrigger>
           <TabsTrigger value="cancellations">Cancellations</TabsTrigger>
         </TabsList>
 
@@ -209,25 +271,82 @@ const EmployeeProfile = () => {
         <TabsContent value="history" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Recent Rides</CardTitle>
-              <CardDescription>Last 30 days ride history</CardDescription>
+              <CardTitle>Detailed Ride History</CardTitle>
+              <CardDescription>Complete ride history with timing and performance details</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {rideHistory.map((ride) => (
-                  <div key={ride.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex items-center space-x-4">
-                      <div className={`w-3 h-3 rounded-full ${
-                        ride.status === 'Completed' ? 'bg-green-500' : 'bg-red-500'
-                      }`}></div>
+                  <div key={ride.id} className="p-4 border rounded-lg space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className={`w-3 h-3 rounded-full ${
+                          ride.status === 'Completed' ? 'bg-green-500' : 'bg-red-500'
+                        }`}></div>
+                        <div>
+                          <div className="font-medium">{ride.pickup} → {ride.drop}</div>
+                          <div className="text-sm text-gray-600">{ride.date}</div>
+                        </div>
+                      </div>
+                      <Badge className={ride.status === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                        {ride.status}
+                      </Badge>
+                    </div>
+                    
+                    {ride.status === 'Completed' && (
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-600">Departure:</span>
+                          <div className="font-medium">{ride.departureTime}</div>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Arrival:</span>
+                          <div className="font-medium">{ride.arrivalTime}</div>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Duration:</span>
+                          <div className="font-medium">{ride.actualDuration}</div>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Distance:</span>
+                          <div className="font-medium">{ride.distance}</div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <div className="font-medium">{ride.pickup} → {ride.drop}</div>
-                        <div className="text-sm text-gray-600">{ride.date} • {ride.time}</div>
+                        <span className="text-gray-600">Vehicle:</span>
+                        <div className="font-medium">{ride.vehicle}</div>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Driver:</span>
+                        <div className="font-medium">{ride.driver}</div>
                       </div>
                     </div>
-                    <Badge className={ride.status === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
-                      {ride.status}
-                    </Badge>
+                    
+                    {ride.status === 'Completed' && (
+                      <div className="flex items-center justify-between pt-2 border-t">
+                        <div className="flex items-center space-x-2">
+                          <div className={`w-2 h-2 rounded-full ${ride.onTime ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                          <span className="text-sm font-medium">
+                            {ride.onTime ? 'On Time' : `Delayed by ${ride.delay}`}
+                          </span>
+                        </div>
+                        {!ride.onTime && (
+                          <Badge variant="outline" className="text-red-600 border-red-300">
+                            Late Arrival
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+                    
+                    {ride.status === 'Cancelled' && (
+                      <div className="pt-2 border-t">
+                        <span className="text-sm text-gray-600">Reason:</span>
+                        <div className="text-sm font-medium text-red-600">{ride.cancelReason}</div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -235,43 +354,96 @@ const EmployeeProfile = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="requests" className="space-y-6">
+        <TabsContent value="routing" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Ride Change Requests</CardTitle>
-              <CardDescription>Employee submitted requests for route or time changes</CardDescription>
+              <CardTitle className="flex items-center">
+                <Route className="w-5 h-5 mr-2" />
+                Current Route Assignment
+              </CardTitle>
+              <CardDescription>Employee's assigned route and vehicle details</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {requests.map((request) => (
-                  <div key={request.id} className="p-4 border rounded-lg">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-2">
-                        <div className="font-medium">{request.type}</div>
-                        <div className="text-sm text-gray-600">
-                          {request.type === 'Route Change' ? (
-                            <>
-                              <div>Current: {request.currentRoute}</div>
-                              <div>Requested: {request.requestedRoute}</div>
-                            </>
-                          ) : (
-                            <>
-                              <div>Current: {request.currentTime}</div>
-                              <div>Requested: {request.requestedTime}</div>
-                            </>
-                          )}
-                        </div>
-                        <div className="text-sm">
-                          <span className="font-medium">Reason:</span> {request.reason}
-                        </div>
-                        <div className="text-sm text-gray-500">{request.date}</div>
-                      </div>
-                      <Badge className={request.status === 'Approved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
-                        {request.status}
-                      </Badge>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Route Information */}
+                <div className="space-y-4">
+                  <h4 className="font-medium text-gray-900 flex items-center">
+                    <Navigation className="w-4 h-4 mr-2" />
+                    Route Details
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Route Name:</span>
+                      <span className="text-sm font-medium">{routingInfo.currentRoute}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Pickup Point:</span>
+                      <span className="text-sm font-medium">{routingInfo.pickupPoint}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Drop Point:</span>
+                      <span className="text-sm font-medium">{routingInfo.dropPoint}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Seat Number:</span>
+                      <span className="text-sm font-medium">{routingInfo.seatNumber}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Status:</span>
+                      <Badge className="bg-green-100 text-green-800">{routingInfo.routeStatus}</Badge>
                     </div>
                   </div>
-                ))}
+                </div>
+
+                {/* Vehicle & Driver Information */}
+                <div className="space-y-4">
+                  <h4 className="font-medium text-gray-900 flex items-center">
+                    <Car className="w-4 h-4 mr-2" />
+                    Vehicle & Driver
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Vehicle Number:</span>
+                      <span className="text-sm font-medium">{routingInfo.vehicleNumber}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Driver Name:</span>
+                      <span className="text-sm font-medium">{routingInfo.driverName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Driver Contact:</span>
+                      <span className="text-sm font-medium">{routingInfo.driverPhone}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Distance:</span>
+                      <span className="text-sm font-medium">{routingInfo.totalDistance}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Est. Duration:</span>
+                      <span className="text-sm font-medium">{routingInfo.estimatedDuration}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Schedule Information */}
+              <div className="pt-4 border-t">
+                <h4 className="font-medium text-gray-900 flex items-center mb-4">
+                  <Clock className="w-4 h-4 mr-2" />
+                  Schedule
+                </h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 bg-blue-50 rounded-lg">
+                    <div className="text-sm text-gray-600">Morning Departure</div>
+                    <div className="text-lg font-bold text-blue-600">{routingInfo.departureTime}</div>
+                    <div className="text-xs text-gray-500">From {routingInfo.pickupPoint}</div>
+                  </div>
+                  <div className="p-3 bg-orange-50 rounded-lg">
+                    <div className="text-sm text-gray-600">Evening Departure</div>
+                    <div className="text-lg font-bold text-orange-600">{routingInfo.returnTime}</div>
+                    <div className="text-xs text-gray-500">From {routingInfo.dropPoint}</div>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
