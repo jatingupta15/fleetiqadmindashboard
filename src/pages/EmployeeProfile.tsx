@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { 
   ArrowLeft, 
   User, 
-  Car, 
   Calendar, 
   X,
   Phone,
@@ -16,8 +15,6 @@ import {
   MapPin,
   Clock,
   AlertTriangle,
-  Route,
-  Navigation,
   Edit
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
@@ -53,21 +50,6 @@ const EmployeeProfile = () => {
       title: "Trip Type Updated",
       description: `Trip type changed to ${newTripType}`,
     });
-  };
-
-  const routingInfo = {
-    currentRoute: 'Noida Sector 62 - Gurgaon Route A',
-    vehicleNumber: 'DL-01-AB-1234',
-    driverName: 'Rajesh Kumar',
-    driverPhone: '+91 9876543210',
-    pickupPoint: 'Sector 62 Metro',
-    dropPoint: 'DLF Cyber City, Gurgaon',
-    departureTime: '08:30 AM',
-    returnTime: '06:30 PM',
-    estimatedDuration: '45 mins',
-    totalDistance: '28 km',
-    seatNumber: 'A-3',
-    routeStatus: 'Active'
   };
 
   const rideHistory = [
@@ -183,10 +165,9 @@ const EmployeeProfile = () => {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="details">Details</TabsTrigger>
           <TabsTrigger value="history">Ride History</TabsTrigger>
-          <TabsTrigger value="routing">Routing</TabsTrigger>
           <TabsTrigger value="cancellations">Cancellations</TabsTrigger>
         </TabsList>
 
@@ -384,101 +365,6 @@ const EmployeeProfile = () => {
                     )}
                   </div>
                 ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="routing" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Route className="w-5 h-5 mr-2" />
-                Current Route Assignment
-              </CardTitle>
-              <CardDescription>Employee's assigned route and vehicle details</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Route Information */}
-                <div className="space-y-4">
-                  <h4 className="font-medium text-gray-900 flex items-center">
-                    <Navigation className="w-4 h-4 mr-2" />
-                    Route Details
-                  </h4>
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Route Name:</span>
-                      <span className="text-sm font-medium">{routingInfo.currentRoute}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Pickup Point:</span>
-                      <span className="text-sm font-medium">{routingInfo.pickupPoint}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Drop Point:</span>
-                      <span className="text-sm font-medium">{routingInfo.dropPoint}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Seat Number:</span>
-                      <span className="text-sm font-medium">{routingInfo.seatNumber}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Status:</span>
-                      <Badge className="bg-green-100 text-green-800">{routingInfo.routeStatus}</Badge>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Vehicle & Driver Information */}
-                <div className="space-y-4">
-                  <h4 className="font-medium text-gray-900 flex items-center">
-                    <Car className="w-4 h-4 mr-2" />
-                    Vehicle & Driver
-                  </h4>
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Vehicle Number:</span>
-                      <span className="text-sm font-medium">{routingInfo.vehicleNumber}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Driver Name:</span>
-                      <span className="text-sm font-medium">{routingInfo.driverName}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Driver Contact:</span>
-                      <span className="text-sm font-medium">{routingInfo.driverPhone}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Distance:</span>
-                      <span className="text-sm font-medium">{routingInfo.totalDistance}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Est. Duration:</span>
-                      <span className="text-sm font-medium">{routingInfo.estimatedDuration}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Schedule Information */}
-              <div className="pt-4 border-t">
-                <h4 className="font-medium text-gray-900 flex items-center mb-4">
-                  <Clock className="w-4 h-4 mr-2" />
-                  Schedule
-                </h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 bg-blue-50 rounded-lg">
-                    <div className="text-sm text-gray-600">Morning Departure</div>
-                    <div className="text-lg font-bold text-blue-600">{routingInfo.departureTime}</div>
-                    <div className="text-xs text-gray-500">From {routingInfo.pickupPoint}</div>
-                  </div>
-                  <div className="p-3 bg-orange-50 rounded-lg">
-                    <div className="text-sm text-gray-600">Evening Departure</div>
-                    <div className="text-lg font-bold text-orange-600">{routingInfo.returnTime}</div>
-                    <div className="text-xs text-gray-500">From {routingInfo.dropPoint}</div>
-                  </div>
-                </div>
               </div>
             </CardContent>
           </Card>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -10,6 +9,7 @@ import AddEmployeeForm from '@/components/AddEmployeeForm';
 import EmployeeTable from '@/components/EmployeeTable';
 import EmployeeFilters from '@/components/EmployeeFilters';
 import EmployeeSideDrawer from '@/components/EmployeeSideDrawer';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from '@/hooks/use-toast';
 
 interface Employee {
@@ -171,23 +171,13 @@ const Employees = () => {
           <h1 className="text-2xl font-bold text-gray-900">Employee Management</h1>
           <p className="text-gray-600">Manage employee profiles and ride access</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" className="flex items-center gap-2" onClick={handleDownloadTemplate}>
-            <Download className="w-4 h-4" />
-            Template
-          </Button>
-          <Button variant="outline" className="flex items-center gap-2" onClick={handleImportCSV}>
-            <Upload className="w-4 h-4" />
-            Import CSV
-          </Button>
-          <Button 
-            className="flex items-center gap-2"
-            onClick={() => setShowAddForm(true)}
-          >
-            <Plus className="w-4 h-4" />
-            Add Employee
-          </Button>
-        </div>
+        <Button 
+          className="flex items-center gap-2"
+          onClick={() => setShowAddForm(true)}
+        >
+          <Plus className="w-4 h-4" />
+          Add Employee
+        </Button>
       </div>
 
       {/* Search and Filters */}
@@ -207,11 +197,38 @@ const Employees = () => {
         onViewDetails={handleViewEmployeeDetails}
       />
 
-      <AddEmployeeForm 
-        open={showAddForm}
-        onOpenChange={setShowAddForm}
-        onSubmit={handleAddEmployee}
-      />
+      {/* Add Employee Dialog */}
+      <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Add New Employee</DialogTitle>
+            <DialogDescription>
+              Fill in the employee details below or use the quick actions to import data
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Quick Actions */}
+            <div className="flex gap-2 p-4 bg-gray-50 rounded-lg">
+              <Button variant="outline" className="flex items-center gap-2" onClick={handleDownloadTemplate}>
+                <Download className="w-4 h-4" />
+                Download Template
+              </Button>
+              <Button variant="outline" className="flex items-center gap-2" onClick={handleImportCSV}>
+                <Upload className="w-4 h-4" />
+                Import CSV
+              </Button>
+            </div>
+
+            {/* Add Employee Form */}
+            <AddEmployeeForm 
+              open={showAddForm}
+              onOpenChange={setShowAddForm}
+              onSubmit={handleAddEmployee}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <EmployeeSideDrawer
         employee={selectedEmployee}
