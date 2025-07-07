@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { 
   Route, 
   MapPin, 
@@ -10,18 +11,23 @@ import {
   User,
   Search,
   Car,
-  Users
+  Users,
+  Eye
 } from 'lucide-react';
+import RouteMapView from '@/components/RouteMapView';
 
 const Routing = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [areaFilter, setAreaFilter] = useState('all');
+  const [selectedRoute, setSelectedRoute] = useState<any>(null);
 
   const routes = [
     {
       id: 1,
       routeName: 'Noida Sector 62 - Gurgaon Route A',
       vehicleNumber: 'DL-01-AB-1234',
+      cabName: 'Innova Crysta',
+      vendorCode: 'VND001',
       driverName: 'Rajesh Kumar',
       driverPhone: '+91 9876543210',
       vehicleCapacity: 12,
@@ -47,6 +53,8 @@ const Routing = () => {
       id: 2,
       routeName: 'Whitefield - Electronic City Route B',
       vehicleNumber: 'KA-05-CD-5678',
+      cabName: 'Toyota Hiace',
+      vendorCode: 'VND002',
       driverName: 'Suresh Reddy',
       driverPhone: '+91 9876543211',
       vehicleCapacity: 15,
@@ -68,6 +76,8 @@ const Routing = () => {
       id: 3,
       routeName: 'Andheri - BKC Route C',
       vehicleNumber: 'MH-12-EF-9012',
+      cabName: 'Maruti Ertiga',
+      vendorCode: 'VND003',
       driverName: 'Ramesh Patil',
       driverPhone: '+91 9876543212',
       vehicleCapacity: 10,
@@ -89,7 +99,9 @@ const Routing = () => {
   const filteredRoutes = routes.filter(route => {
     const matchesSearch = route.routeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          route.vehicleNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         route.driverName.toLowerCase().includes(searchTerm.toLowerCase());
+                         route.driverName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         route.cabName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         route.vendorCode.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesArea = areaFilter === 'all' || route.area.toLowerCase().includes(areaFilter.toLowerCase());
     return matchesSearch && matchesArea;
   });
@@ -118,7 +130,7 @@ const Routing = () => {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
-                placeholder="Search routes, vehicles, or drivers..."
+                placeholder="Search routes, vehicles, drivers, or cab names..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -152,12 +164,28 @@ const Routing = () => {
                   </div>
                   <div>
                     <CardTitle className="text-lg">{route.routeName}</CardTitle>
-                    <CardDescription>{route.area}</CardDescription>
+                    <CardDescription className="flex items-center gap-2">
+                      <span>{route.area}</span>
+                      <Badge variant="outline" className="text-xs">
+                        {route.cabName} • {route.vendorCode}
+                      </Badge>
+                    </CardDescription>
                   </div>
                 </div>
-                <Badge className="bg-green-100 text-green-800">
-                  {route.assignedEmployees}/{route.vehicleCapacity} seats
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-green-100 text-green-800">
+                    {route.assignedEmployees}/{route.vehicleCapacity} seats
+                  </Badge>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedRoute(route)}
+                    className="flex items-center gap-1"
+                  >
+                    <Eye className="w-4 h-4" />
+                    View Route
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -169,6 +197,14 @@ const Routing = () => {
                     Vehicle & Driver
                   </h4>
                   <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Cab Name:</span>
+                      <span className="text-sm font-medium">{route.cabName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Vendor Code:</span>
+                      <span className="text-sm font-medium">{route.vendorCode}</span>
+                    </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Vehicle:</span>
                       <span className="text-sm font-medium">{route.vehicleNumber}</span>
@@ -248,6 +284,14 @@ const Routing = () => {
           </Card>
         ))}
       </div>
+
+      {/* Route Map View Modal */}
+      {selectedRoute && (
+        <RouteMapView
+          route={selectedRoute}
+          onClose={() => setSelectedRoute(null)}
+        />
+      )}
     </div>
   );
 };
