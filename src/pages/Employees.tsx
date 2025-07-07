@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -8,9 +9,9 @@ import {
 import AddEmployeeForm from '@/components/AddEmployeeForm';
 import EmployeeTable from '@/components/EmployeeTable';
 import EmployeeFilters from '@/components/EmployeeFilters';
-import EmployeeSideDrawer from '@/components/EmployeeSideDrawer';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface Employee {
   id: number;
@@ -27,11 +28,10 @@ interface Employee {
 }
 
 const Employees = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDepartment, setSelectedDepartment] = useState('all');
+  const [selectedFilters, setSelectedFilters] = useState<string[]>(['all']);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
-  const [showSideDrawer, setShowSideDrawer] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([
     {
       id: 1,
@@ -94,22 +94,24 @@ const Employees = () => {
                          emp.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          emp.email.toLowerCase().includes(searchTerm.toLowerCase());
     
-    let matchesFilter = true;
-    if (selectedDepartment !== 'all') {
-      if (departments.includes(selectedDepartment)) {
-        matchesFilter = emp.department === selectedDepartment;
-      } else if (selectedDepartment === 'day') {
-        matchesFilter = emp.shift === 'Day';
-      } else if (selectedDepartment === 'night') {
-        matchesFilter = emp.shift === 'Night';
-      } else if (selectedDepartment === 'active') {
-        matchesFilter = emp.status === 'Active';
-      } else if (selectedDepartment === 'inactive') {
-        matchesFilter = emp.status === 'Inactive';
-      }
-    }
+    if (selectedFilters.includes('all')) return matchesSearch;
     
-    return matchesSearch && matchesFilter;
+    const matchesFilters = selectedFilters.some(filter => {
+      if (departments.includes(filter)) {
+        return emp.department === filter;
+      } else if (filter === 'day') {
+        return emp.shift === 'Day';
+      } else if (filter === 'night') {
+        return emp.shift === 'Night';
+      } else if (filter === 'active') {
+        return emp.status === 'Active';
+      } else if (filter === 'inactive') {
+        return emp.status === 'Inactive';
+      }
+      return false;
+    });
+    
+    return matchesSearch && matchesFilters;
   });
 
   const handleAddEmployee = (data: any) => {
@@ -145,8 +147,7 @@ const Employees = () => {
   };
 
   const handleViewEmployeeDetails = (employee: Employee) => {
-    setSelectedEmployee(employee);
-    setShowSideDrawer(true);
+    navigate(`/employee-profile/${employee.id}`);
   };
 
   const handleDownloadTemplate = () => {
@@ -183,10 +184,10 @@ const Employees = () => {
       {/* Search and Filters */}
       <EmployeeFilters
         searchTerm={searchTerm}
-        selectedDepartment={selectedDepartment}
+        selectedFilters={selectedFilters}
         departments={departments}
         onSearchChange={setSearchTerm}
-        onDepartmentChange={setSelectedDepartment}
+        onFiltersChange={setSelectedFilters}
       />
 
       {/* Employee Table */}
@@ -216,7 +217,7 @@ const Employees = () => {
               </Button>
               <Button variant="outline" className="flex items-center gap-2" onClick={handleImportCSV}>
                 <Upload className="w-4 h-4" />
-                Import CSV
+                Upload CSV
               </Button>
             </div>
 
@@ -229,12 +230,6 @@ const Employees = () => {
           </div>
         </DialogContent>
       </Dialog>
-
-      <EmployeeSideDrawer
-        employee={selectedEmployee}
-        isOpen={showSideDrawer}
-        onClose={() => setShowSideDrawer(false)}
-      />
     </div>
   );
 };
