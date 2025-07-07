@@ -19,6 +19,7 @@ import { toast } from '@/hooks/use-toast';
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sosActive] = useState(true);
+  const [notificationCount] = useState(3); // Simulated unread notifications
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -136,8 +137,21 @@ const DashboardLayout = () => {
                 <Plus className="w-4 h-4 mr-2" />
                 Book Special Ride
               </Button>
-              <Button variant="ghost" size="sm">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="relative"
+                onClick={() => navigate('/notifications')}
+              >
                 <Bell className="w-4 h-4" />
+                {notificationCount > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center text-xs p-0"
+                  >
+                    {notificationCount}
+                  </Badge>
+                )}
               </Button>
               <Button variant="ghost" size="sm" onClick={handleLogout}>
                 Logout

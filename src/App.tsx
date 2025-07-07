@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +15,7 @@ import Cancellations from "./pages/Cancellations";
 import SOSAlerts from "./pages/SOSAlerts";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
+import Notifications from "./pages/Notifications";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -61,6 +63,7 @@ const App = () => (
             <Route path="/sos-alerts" element={<SOSAlerts />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/notifications" element={<Notifications />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
