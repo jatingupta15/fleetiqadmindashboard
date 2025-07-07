@@ -1,26 +1,33 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
 import { 
   Users, 
   Car, 
-  Calendar, 
+  Calendar as CalendarIcon, 
   AlertTriangle,
   TrendingUp,
   Clock,
   MapPin,
   Phone,
   Route,
-  Fuel,
   BarChart3,
   Shield,
   CheckCircle,
   XCircle
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const Dashboard = () => {
+  const [dateFilter, setDateFilter] = useState('today');
+  const [customDate, setCustomDate] = useState<Date>();
+
   const metrics = [
     { title: 'Total Rides Today', value: '127', change: '+12%', icon: Car, color: 'text-blue-600' },
     { title: 'Active Employees', value: '284', change: '+3%', icon: Users, color: 'text-green-600' },
@@ -133,6 +140,50 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
+      {/* Date Filter */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
+        <div className="flex items-center space-x-4">
+          <Select value={dateFilter} onValueChange={setDateFilter}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Select period" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="today">Today</SelectItem>
+              <SelectItem value="week">This Week</SelectItem>
+              <SelectItem value="month">This Month</SelectItem>
+              <SelectItem value="custom">Custom</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          {dateFilter === 'custom' && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-40 justify-start text-left font-normal",
+                    !customDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {customDate ? format(customDate, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={customDate}
+                  onSelect={setCustomDate}
+                  initialFocus
+                  className="p-3 pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+          )}
+        </div>
+      </div>
+
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {metrics.map((metric, index) => {
@@ -157,29 +208,23 @@ const Dashboard = () => {
         })}
       </div>
 
-      {/* Top Cancellation Reasons - 4 Cards */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4 flex items-center">
-          <XCircle className="w-5 h-5 mr-2" />
-          Top Cancellation Reasons (Last 30 days)
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {topCancellationReasons.map((reason, index) => (
-            <Card key={index} className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                  <div className={`text-xs font-medium ${reason.trend.startsWith('+') ? 'text-red-500' : reason.trend.startsWith('-') ? 'text-green-500' : 'text-gray-500'}`}>
-                    {reason.trend}
-                  </div>
+      {/* Cancellation Reasons - 4 Cards (without heading) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {topCancellationReasons.map((reason, index) => (
+          <Card key={index} className="hover:shadow-lg transition-shadow">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                <div className={`text-xs font-medium ${reason.trend.startsWith('+') ? 'text-red-500' : reason.trend.startsWith('-') ? 'text-green-500' : 'text-gray-500'}`}>
+                  {reason.trend}
                 </div>
-                <div className="text-sm font-medium text-gray-900 mb-1">{reason.reason}</div>
-                <div className="text-2xl font-bold mb-1">{reason.count}</div>
-                <div className="text-xs text-gray-500">cases ({reason.percentage}%)</div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              </div>
+              <div className="text-sm font-medium text-gray-900 mb-1">{reason.reason}</div>
+              <div className="text-2xl font-bold mb-1">{reason.count}</div>
+              <div className="text-xs text-gray-500">cases ({reason.percentage}%)</div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* Recent Activity */}
