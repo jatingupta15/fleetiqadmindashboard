@@ -88,19 +88,19 @@ const EmployeeFilters = ({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Filters</SelectItem>
-              <SelectItem disabled className="font-medium text-gray-900">Department</SelectItem>
+              <SelectItem value="department-header" disabled className="font-medium text-gray-900">Department</SelectItem>
               {departments.slice(1).map(dept => (
                 <SelectItem key={`dept-${dept}`} value={dept} className="pl-6">
                   {dept}
                 </SelectItem>
               ))}
-              <SelectItem disabled className="font-medium text-gray-900">Shift</SelectItem>
+              <SelectItem value="shift-header" disabled className="font-medium text-gray-900">Shift</SelectItem>
               <SelectItem value="day" className="pl-6">Day Shift</SelectItem>
               <SelectItem value="night" className="pl-6">Night Shift</SelectItem>
-              <SelectItem disabled className="font-medium text-gray-900">Status</SelectItem>
+              <SelectItem value="status-header" disabled className="font-medium text-gray-900">Status</SelectItem>
               <SelectItem value="active" className="pl-6">Active</SelectItem>
               <SelectItem value="inactive" className="pl-6">Inactive</SelectItem>
-              <SelectItem disabled className="font-medium text-gray-900">Trip Type</SelectItem>
+              <SelectItem value="triptype-header" disabled className="font-medium text-gray-900">Trip Type</SelectItem>
               <SelectItem value="both" className="pl-6">Both</SelectItem>
               <SelectItem value="pickup" className="pl-6">Pickup Only</SelectItem>
               <SelectItem value="drop" className="pl-6">Drop Only</SelectItem>
