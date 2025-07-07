@@ -1,9 +1,25 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { 
   AlertTriangle, 
   MapPin, 
@@ -18,6 +34,10 @@ import { toast } from '@/hooks/use-toast';
 
 const SOSAlerts = () => {
   const [activeTab, setActiveTab] = useState('active');
+  const [resolveDialogOpen, setResolveDialogOpen] = useState(false);
+  const [selectedAlertId, setSelectedAlertId] = useState<number | null>(null);
+  const [resolutionReason, setResolutionReason] = useState('');
+  const [resolutionNotes, setResolutionNotes] = useState('');
 
   const activeAlerts = [
     {
@@ -77,6 +97,17 @@ const SOSAlerts = () => {
     }
   ];
 
+  const resolutionReasons = [
+    'False alarm - accidental trigger',
+    'Vehicle breakdown',
+    'Medical emergency',
+    'Security concern',
+    'Traffic incident',
+    'Route change required',
+    'Driver issue',
+    'Other'
+  ];
+
   const handleCall = (phone: string, name: string) => {
     toast({
       title: `Calling ${name}`,
@@ -84,11 +115,31 @@ const SOSAlerts = () => {
     });
   };
 
-  const handleResolve = (alertId: number) => {
+  const handleResolveClick = (alertId: number) => {
+    setSelectedAlertId(alertId);
+    setResolveDialogOpen(true);
+  };
+
+  const handleResolveSubmit = () => {
+    if (!resolutionReason) {
+      toast({
+        title: "Error",
+        description: "Please select a resolution reason",
+        variant: "destructive"
+      });
+      return;
+    }
+
     toast({
       title: "Alert Resolved",
-      description: "SOS alert has been marked as resolved",
+      description: `SOS alert has been marked as resolved. Reason: ${resolutionReason}`,
     });
+
+    // Reset form and close dialog
+    setResolveDialogOpen(false);
+    setSelectedAlertId(null);
+    setResolutionReason('');
+    setResolutionNotes('');
   };
 
   const getStatusColor = (status: string) => {
@@ -262,7 +313,7 @@ const SOSAlerts = () => {
                         </div>
                         
                         <Button
-                          onClick={() => handleResolve(alert.id)}
+                          onClick={() => handleResolveClick(alert.id)}
                           className="w-full bg-green-600 hover:bg-green-700"
                         >
                           <CheckCircle className="w-4 h-4 mr-2" />
@@ -339,6 +390,66 @@ const SOSAlerts = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Resolution Dialog */}
+      <Dialog open={resolveDialogOpen} onOpenChange={setResolveDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <CheckCircle className="w-5 h-5 mr-2 text-green-600" />
+              Resolve SOS Alert
+            </DialogTitle>
+            <DialogDescription>
+              Please provide the reason for resolving this SOS alert to maintain proper records.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="reason">Resolution Reason *</Label>
+              <Select value={resolutionReason} onValueChange={setResolutionReason}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select reason for SOS alert..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {resolutionReasons.map((reason) => (
+                    <SelectItem key={reason} value={reason}>
+                      {reason}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="notes">Additional Notes (Optional)</Label>
+              <Textarea
+                id="notes"
+                placeholder="Add any additional details about the resolution..."
+                value={resolutionNotes}
+                onChange={(e) => setResolutionNotes(e.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+          
+          <div className="flex justify-end space-x-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setResolveDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleResolveSubmit}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Resolve Alert
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
