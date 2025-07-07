@@ -7,8 +7,14 @@ import {
   UserX,
   MoreHorizontal
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
 import { useNavigate } from 'react-router-dom';
-import { toast } from '@/hooks/use-toast';
 
 interface Employee {
   id: number;
@@ -39,26 +45,10 @@ const EmployeeActions = ({ employee, onEdit, onDeactivate }: EmployeeActionsProp
 
   const handleEdit = () => {
     onEdit(employee);
-    toast({
-      title: "Edit Employee",
-      description: `Editing ${employee.name}'s profile.`,
-    });
   };
 
   const handleDeactivate = () => {
     onDeactivate(employee);
-    toast({
-      title: "Employee Deactivated",
-      description: `${employee.name} has been deactivated.`,
-      variant: "destructive",
-    });
-  };
-
-  const handleMore = () => {
-    toast({
-      title: "More Options",
-      description: "Additional options for this employee.",
-    });
   };
 
   return (
@@ -71,30 +61,32 @@ const EmployeeActions = ({ employee, onEdit, onDeactivate }: EmployeeActionsProp
       >
         <Eye className="w-4 h-4" />
       </Button>
-      <Button 
-        size="sm" 
-        variant="ghost"
-        onClick={handleEdit}
-        title="Edit Employee"
-      >
-        <Edit className="w-4 h-4" />
-      </Button>
-      <Button 
-        size="sm" 
-        variant="ghost"
-        onClick={handleDeactivate}
-        title="Deactivate Employee"
-      >
-        <UserX className="w-4 h-4" />
-      </Button>
-      <Button 
-        size="sm" 
-        variant="ghost"
-        onClick={handleMore}
-        title="More Options"
-      >
-        <MoreHorizontal className="w-4 h-4" />
-      </Button>
+      
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button 
+            size="sm" 
+            variant="ghost"
+            title="More Options"
+          >
+            <MoreHorizontal className="w-4 h-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuItem onClick={handleEdit}>
+            <Edit className="w-4 h-4 mr-2" />
+            Edit Profile
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem 
+            onClick={handleDeactivate}
+            className="text-red-600 focus:text-red-600"
+          >
+            <UserX className="w-4 h-4 mr-2" />
+            Deactivate Employee
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };

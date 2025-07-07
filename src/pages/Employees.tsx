@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -10,6 +9,7 @@ import {
 import AddEmployeeForm from '@/components/AddEmployeeForm';
 import EmployeeTable from '@/components/EmployeeTable';
 import EmployeeFilters from '@/components/EmployeeFilters';
+import DeactivateEmployeeDialog from '@/components/DeactivateEmployeeDialog';
 import { toast } from '@/hooks/use-toast';
 
 interface Employee {
@@ -29,8 +29,12 @@ interface Employee {
 const Employees = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
+  const [selectedShifts, setSelectedShifts] = useState<string[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showDeactivateDialog, setShowDeactivateDialog] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [employees, setEmployees] = useState<Employee[]>([
     {
       id: 1,
@@ -93,7 +97,9 @@ const Employees = () => {
                          emp.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          emp.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDepartment = selectedDepartments.length === 0 || selectedDepartments.includes(emp.department);
-    return matchesSearch && matchesDepartment;
+    const matchesShift = selectedShifts.length === 0 || selectedShifts.includes(emp.shift);
+    const matchesStatus = selectedStatuses.length === 0 || selectedStatuses.includes(emp.status);
+    return matchesSearch && matchesDepartment && matchesShift && matchesStatus;
   });
 
   const handleAddEmployee = (data: any) => {
@@ -125,9 +131,15 @@ const Employees = () => {
   };
 
   const handleDeactivateEmployee = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setShowDeactivateDialog(true);
+  };
+
+  const handleConfirmDeactivation = (employee: Employee, reason: string, comments?: string) => {
     setEmployees(employees.map(emp => 
       emp.id === employee.id ? { ...emp, status: 'Inactive' } : emp
     ));
+    console.log('Deactivation reason:', reason, 'Comments:', comments);
   };
 
   const handleDownloadTemplate = () => {
@@ -192,9 +204,13 @@ John Sample,Software Engineer,IT,Day,+91 9876543210,john@company.com,Sample Addr
       <EmployeeFilters
         searchTerm={searchTerm}
         selectedDepartments={selectedDepartments}
+        selectedShifts={selectedShifts}
+        selectedStatuses={selectedStatuses}
         departments={departments}
         onSearchChange={setSearchTerm}
         onDepartmentChange={setSelectedDepartments}
+        onShiftChange={setSelectedShifts}
+        onStatusChange={setSelectedStatuses}
       />
 
       {/* Employee Table */}
@@ -246,6 +262,13 @@ John Sample,Software Engineer,IT,Day,+91 9876543210,john@company.com,Sample Addr
         open={showAddForm}
         onOpenChange={setShowAddForm}
         onSubmit={handleAddEmployee}
+      />
+
+      <DeactivateEmployeeDialog
+        employee={selectedEmployee}
+        open={showDeactivateDialog}
+        onOpenChange={setShowDeactivateDialog}
+        onConfirm={handleConfirmDeactivation}
       />
     </div>
   );
