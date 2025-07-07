@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,15 +12,25 @@ import {
   AlertTriangle,
   Menu,
   Plus,
-  Route
+  Route,
+  Shield
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sosActive] = useState(true);
+  const [userRole, setUserRole] = useState('');
+  const [userEmail, setUserEmail] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    const role = localStorage.getItem('userRole') || '';
+    const email = localStorage.getItem('userEmail') || '';
+    setUserRole(role);
+    setUserEmail(email);
+  }, []);
 
   const navigationItems = [
     { path: '/dashboard', label: 'Dashboard', icon: BarChart3 },
@@ -35,8 +45,17 @@ const DashboardLayout = () => {
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('userEmail');
+    localStorage.removeItem('userRole');
     toast({ title: "Logged out successfully" });
     navigate('/');
+  };
+
+  const getRoleColor = (role: string) => {
+    return role === 'super-admin' ? 'bg-purple-600' : 'bg-indigo-600';
+  };
+
+  const getRoleLabel = (role: string) => {
+    return role === 'super-admin' ? 'Super Admin' : 'Admin';
   };
 
   return (
@@ -46,8 +65,12 @@ const DashboardLayout = () => {
         <div className="p-4 border-b">
           <div className="flex items-center justify-between">
             <div className={`flex items-center space-x-2 ${!sidebarOpen && 'justify-center'}`}>
-              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">FP</span>
+              <div className={`w-8 h-8 ${getRoleColor(userRole)} rounded-lg flex items-center justify-center`}>
+                {userRole === 'super-admin' ? (
+                  <Shield className="w-4 h-4 text-white" />
+                ) : (
+                  <span className="text-white font-bold text-sm">FP</span>
+                )}
               </div>
               {sidebarOpen && <span className="font-bold text-gray-900">FleetPro</span>}
             </div>
@@ -59,6 +82,14 @@ const DashboardLayout = () => {
               <Menu className="w-4 h-4" />
             </Button>
           </div>
+          {sidebarOpen && userRole && (
+            <div className="mt-3">
+              <Badge className={`${getRoleColor(userRole)} text-white`}>
+                {getRoleLabel(userRole)}
+              </Badge>
+              <p className="text-xs text-gray-500 mt-1 truncate">{userEmail}</p>
+            </div>
+          )}
         </div>
         
         <nav className="p-4">
@@ -124,9 +155,16 @@ const DashboardLayout = () => {
         {/* Top Navigation */}
         <header className="bg-white shadow-sm border-b p-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-semibold text-gray-900">
-              Fleet Management Dashboard
-            </h1>
+            <div className="flex items-center space-x-4">
+              <h1 className="text-xl font-semibold text-gray-900">
+                Fleet Management Dashboard
+              </h1>
+              {userRole === 'super-admin' && (
+                <Badge className="bg-purple-100 text-purple-800">
+                  Super Admin Access
+                </Badge>
+              )}
+            </div>
             <div className="flex items-center space-x-4">
               <Button
                 variant="outline"
@@ -139,9 +177,12 @@ const DashboardLayout = () => {
               <Button variant="ghost" size="sm">
                 <Bell className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
-                Logout
-              </Button>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-600">{getRoleLabel(userRole)}</span>
+                <Button variant="ghost" size="sm" onClick={handleLogout}>
+                  Logout
+                </Button>
+              </div>
             </div>
           </div>
         </header>
