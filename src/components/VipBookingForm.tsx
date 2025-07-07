@@ -11,8 +11,8 @@ import { User, MapPin, Calendar, Send, Car } from 'lucide-react';
 interface VipFormData {
   riderName: string;
   riderPhone: string;
-  pickupLocation: string;
-  dropLocation: string;
+  loginLocation: string;
+  logoutLocation: string;
   rideDate: string;
   rideTime: string;
   duration: string;
@@ -90,17 +90,17 @@ const VipBookingForm: React.FC<VipBookingFormProps> = ({
             </h3>
             <div className="space-y-4">
               <GoogleLocationPicker
-                label="Pickup Location"
-                placeholder="Search for pickup location..."
-                value={formData.pickupLocation}
-                onChange={(value, placeDetails) => onLocationChange('pickupLocation', value, placeDetails)}
+                label="Login Location"
+                placeholder="Search for login location..."
+                value={formData.loginLocation}
+                onChange={(value, placeDetails) => onLocationChange('loginLocation', value, placeDetails)}
                 required
               />
               <GoogleLocationPicker
-                label="Drop Location"
-                placeholder="Search for drop location..."
-                value={formData.dropLocation}
-                onChange={(value, placeDetails) => onLocationChange('dropLocation', value, placeDetails)}
+                label="Logout Location"
+                placeholder="Search for logout location..."
+                value={formData.logoutLocation}
+                onChange={(value, placeDetails) => onLocationChange('logoutLocation', value, placeDetails)}
                 required
               />
             </div>

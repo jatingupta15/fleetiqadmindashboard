@@ -8,8 +8,8 @@ interface BookingRequest {
   employeeName: string;
   employeeId: string;
   department: string;
-  pickupLocation: string;
-  dropLocation: string;
+  loginLocation: string;
+  logoutLocation: string;
   rideDate: string;
   rideTime: string;
   reason: string;
@@ -56,7 +56,7 @@ const RequestStatusCard: React.FC<RequestStatusCardProps> = ({ request }) => {
         <div>{request.reason}</div>
         <div className="flex items-center space-x-1">
           <MapPin className="w-3 h-3" />
-          <span>{request.pickupLocation} → {request.dropLocation}</span>
+          <span>{request.loginLocation} → {request.logoutLocation}</span>
         </div>
       </div>
       {request.notes && (

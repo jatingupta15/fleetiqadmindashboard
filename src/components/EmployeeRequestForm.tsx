@@ -13,8 +13,8 @@ interface EmployeeFormData {
   employeeName: string;
   employeeId: string;
   department: string;
-  pickupLocation: string;
-  dropLocation: string;
+  loginLocation: string;
+  logoutLocation: string;
   rideDate: string;
   rideTime: string;
   tripType: string;
@@ -97,16 +97,16 @@ const EmployeeRequestForm: React.FC<EmployeeRequestFormProps> = ({
               className="grid grid-cols-1 md:grid-cols-3 gap-4"
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="pickup-only" id="pickup-only" />
-                <Label htmlFor="pickup-only">Pickup Only</Label>
+                <RadioGroupItem value="login-only" id="login-only" />
+                <Label htmlFor="login-only">Login Only</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="drop-only" id="drop-only" />
-                <Label htmlFor="drop-only">Drop Off Only</Label>
+                <RadioGroupItem value="logout-only" id="logout-only" />
+                <Label htmlFor="logout-only">Logout Only</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="both" id="both" />
-                <Label htmlFor="both">Both Pickup & Drop</Label>
+                <Label htmlFor="both">Both Login & Logout</Label>
               </div>
             </RadioGroup>
           </div>
@@ -118,21 +118,21 @@ const EmployeeRequestForm: React.FC<EmployeeRequestFormProps> = ({
               Location Details
             </h3>
             <div className="space-y-4">
-              {(formData.tripType === 'pickup-only' || formData.tripType === 'both') && (
+              {(formData.tripType === 'login-only' || formData.tripType === 'both') && (
                 <GoogleLocationPicker
-                  label="Pickup Location"
-                  placeholder="Search for pickup location..."
-                  value={formData.pickupLocation}
-                  onChange={(value, placeDetails) => onLocationChange('pickupLocation', value, placeDetails)}
+                  label="Login Location"
+                  placeholder="Search for login location..."
+                  value={formData.loginLocation}
+                  onChange={(value, placeDetails) => onLocationChange('loginLocation', value, placeDetails)}
                   required
                 />
               )}
-              {(formData.tripType === 'drop-only' || formData.tripType === 'both') && (
+              {(formData.tripType === 'logout-only' || formData.tripType === 'both') && (
                 <GoogleLocationPicker
-                  label="Drop Location"
-                  placeholder="Search for drop location..."
-                  value={formData.dropLocation}
-                  onChange={(value, placeDetails) => onLocationChange('dropLocation', value, placeDetails)}
+                  label="Logout Location"
+                  placeholder="Search for logout location..."
+                  value={formData.logoutLocation}
+                  onChange={(value, placeDetails) => onLocationChange('logoutLocation', value, placeDetails)}
                   required
                 />
               )}
