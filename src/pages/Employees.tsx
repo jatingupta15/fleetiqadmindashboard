@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { 
   Plus, 
   Upload, 
@@ -27,7 +28,8 @@ interface Employee {
 
 const Employees = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDepartment, setSelectedDepartment] = useState('all');
+  const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
+  const [showAddDialog, setShowAddDialog] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([
     {
@@ -84,13 +86,13 @@ const Employees = () => {
     }
   ]);
 
-  const departments = ['all', 'IT', 'HR', 'Finance', 'Marketing', 'Operations'];
+  const departments = ['IT', 'HR', 'Finance', 'Marketing', 'Operations'];
 
   const filteredEmployees = employees.filter(emp => {
     const matchesSearch = emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          emp.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          emp.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDepartment = selectedDepartment === 'all' || emp.department === selectedDepartment;
+    const matchesDepartment = selectedDepartments.length === 0 || selectedDepartments.includes(emp.department);
     return matchesSearch && matchesDepartment;
   });
 
@@ -110,6 +112,8 @@ const Employees = () => {
     };
     
     setEmployees([...employees, newEmployee]);
+    setShowAddForm(false);
+    setShowAddDialog(false);
     toast({
       title: "Employee Added",
       description: `${data.name} has been successfully added to the system.`,
@@ -118,7 +122,6 @@ const Employees = () => {
 
   const handleEditEmployee = (employee: Employee) => {
     console.log('Edit employee:', employee);
-    // Here you would typically open an edit form or navigate to edit page
   };
 
   const handleDeactivateEmployee = (employee: Employee) => {
@@ -128,6 +131,19 @@ const Employees = () => {
   };
 
   const handleDownloadTemplate = () => {
+    const csvContent = `Name,Designation,Department,Shift,Mobile,Email,Address,Gender
+John Sample,Software Engineer,IT,Day,+91 9876543210,john@company.com,Sample Address,Male`;
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'employee-template.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
     toast({
       title: "Template Downloaded",
       description: "Employee template has been downloaded successfully.",
@@ -135,10 +151,24 @@ const Employees = () => {
   };
 
   const handleImportCSV = () => {
-    toast({
-      title: "Import CSV",
-      description: "CSV import functionality will be implemented soon.",
-    });
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        toast({
+          title: "CSV Import",
+          description: `Importing ${file.name}. This feature will be fully implemented soon.`,
+        });
+      }
+    };
+    input.click();
+  };
+
+  const handleManualAdd = () => {
+    setShowAddDialog(false);
+    setShowAddForm(true);
   };
 
   return (
@@ -149,32 +179,22 @@ const Employees = () => {
           <h1 className="text-2xl font-bold text-gray-900">Employee Management</h1>
           <p className="text-gray-600">Manage employee profiles and ride access</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" className="flex items-center gap-2" onClick={handleDownloadTemplate}>
-            <Download className="w-4 h-4" />
-            Template
-          </Button>
-          <Button variant="outline" className="flex items-center gap-2" onClick={handleImportCSV}>
-            <Upload className="w-4 h-4" />
-            Import CSV
-          </Button>
-          <Button 
-            className="flex items-center gap-2"
-            onClick={() => setShowAddForm(true)}
-          >
-            <Plus className="w-4 h-4" />
-            Add Employee
-          </Button>
-        </div>
+        <Button 
+          className="flex items-center gap-2"
+          onClick={() => setShowAddDialog(true)}
+        >
+          <Plus className="w-4 h-4" />
+          Add Employee
+        </Button>
       </div>
 
       {/* Search and Filters */}
       <EmployeeFilters
         searchTerm={searchTerm}
-        selectedDepartment={selectedDepartment}
+        selectedDepartments={selectedDepartments}
         departments={departments}
         onSearchChange={setSearchTerm}
-        onDepartmentChange={setSelectedDepartment}
+        onDepartmentChange={setSelectedDepartments}
       />
 
       {/* Employee Table */}
@@ -183,6 +203,44 @@ const Employees = () => {
         onEdit={handleEditEmployee}
         onDeactivate={handleDeactivateEmployee}
       />
+
+      {/* Add Employee Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add Employee</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Button 
+              onClick={handleManualAdd}
+              className="w-full justify-start"
+              variant="outline"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Manually
+            </Button>
+            
+            <div className="flex gap-2">
+              <Button 
+                onClick={handleDownloadTemplate}
+                variant="outline" 
+                className="flex-1"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download Template
+              </Button>
+              <Button 
+                onClick={handleImportCSV}
+                variant="outline"
+                className="flex-1"
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Upload CSV
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <AddEmployeeForm 
         open={showAddForm}

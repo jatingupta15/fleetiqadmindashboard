@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,6 @@ import {
   BarChart3, 
   AlertTriangle,
   Menu,
-  X,
   Plus,
   Route
 } from 'lucide-react';
@@ -27,7 +27,6 @@ const DashboardLayout = () => {
     { path: '/employees', label: 'Employees', icon: Users },
     { path: '/routing', label: 'Smart Routing', icon: Route },
     { path: '/special-rides', label: 'Special Rides', icon: Plus },
-    { path: '/cancellations', label: 'Cancellations', icon: X },
     { path: '/sos-alerts', label: 'SOS Alerts', icon: AlertTriangle, badge: sosActive ? '1' : undefined },
     { path: '/analytics', label: 'Analytics', icon: BarChart3 },
     { path: '/settings', label: 'Settings', icon: Settings },
