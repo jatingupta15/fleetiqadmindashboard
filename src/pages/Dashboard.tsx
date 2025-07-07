@@ -28,6 +28,14 @@ const Dashboard = () => {
     { title: 'SOS Alerts', value: '1', change: 'Active', icon: AlertTriangle, color: 'text-red-600' },
   ];
 
+  // Top cancellation reasons for smaller cards
+  const topCancellationReasons = [
+    { reason: 'Work from Home', count: 18, percentage: 32, trend: '+5%', color: 'text-blue-600' },
+    { reason: 'Illness', count: 12, percentage: 21, trend: '-2%', color: 'text-green-600' },
+    { reason: 'Personal Emergency', count: 9, percentage: 16, trend: '+1%', color: 'text-orange-600' },
+    { reason: 'Meeting Cancelled', count: 8, percentage: 14, trend: '-3%', color: 'text-purple-600' },
+  ];
+
   const recentActivity = [
     { 
       id: 1, 
@@ -91,15 +99,6 @@ const Dashboard = () => {
     },
   ];
 
-  const cancellationStats = [
-    { reason: 'Work from Home', count: 18, percentage: 32, trend: '+5%' },
-    { reason: 'Illness', count: 12, percentage: 21, trend: '-2%' },
-    { reason: 'Personal Emergency', count: 9, percentage: 16, trend: '+1%' },
-    { reason: 'Meeting Cancelled', count: 8, percentage: 14, trend: '-3%' },
-    { reason: 'Traffic Issues', count: 6, percentage: 11, trend: '+2%' },
-    { reason: 'Other', count: 3, percentage: 6, trend: '0%' },
-  ];
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'bg-blue-100 text-blue-800';
@@ -158,6 +157,31 @@ const Dashboard = () => {
         })}
       </div>
 
+      {/* Top Cancellation Reasons - 4 Cards */}
+      <div>
+        <h2 className="text-lg font-semibold mb-4 flex items-center">
+          <XCircle className="w-5 h-5 mr-2" />
+          Top Cancellation Reasons (Last 30 days)
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {topCancellationReasons.map((reason, index) => (
+            <Card key={index} className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <div className={`text-xs font-medium ${reason.trend.startsWith('+') ? 'text-red-500' : reason.trend.startsWith('-') ? 'text-green-500' : 'text-gray-500'}`}>
+                    {reason.trend}
+                  </div>
+                </div>
+                <div className="text-sm font-medium text-gray-900 mb-1">{reason.reason}</div>
+                <div className="text-2xl font-bold mb-1">{reason.count}</div>
+                <div className="text-xs text-gray-500">cases ({reason.percentage}%)</div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
       {/* Recent Activity */}
       <Card>
         <CardHeader>
@@ -214,68 +238,9 @@ const Dashboard = () => {
         </CardContent>
       </Card>
 
-      {/* Enhanced Stats Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Fleet Utilization - More Detailed */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Car className="w-5 h-5 mr-2" />
-              Fleet Efficiency
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[
-                { type: 'Sedan Fleet', active: 12, total: 15, efficiency: '94%', fuel: '85%', color: 'bg-blue-500' },
-                { type: 'SUV Fleet', active: 8, total: 10, efficiency: '89%', fuel: '78%', color: 'bg-green-500' },
-                { type: 'Executive Cars', active: 5, total: 6, efficiency: '92%', fuel: '82%', color: 'bg-purple-500' },
-                { type: 'Minibus Fleet', active: 3, total: 4, efficiency: '87%', fuel: '76%', color: 'bg-orange-500' },
-              ].map((fleet) => (
-                <div key={fleet.type} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-3 h-3 rounded-full ${fleet.color}`}></div>
-                      <span className="text-sm font-medium">{fleet.type}</span>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-bold">{fleet.active}/{fleet.total} Active</div>
-                      <div className="text-xs text-gray-500">Efficiency: {fleet.efficiency}</div>
-                    </div>
-                  </div>
-                  <div className="flex space-x-2">
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between text-xs">
-                        <span>Usage</span>
-                        <span>{Math.round((fleet.active / fleet.total) * 100)}%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-1.5">
-                        <div 
-                          className={`h-1.5 rounded-full ${fleet.color}`}
-                          style={{ width: `${(fleet.active / fleet.total) * 100}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between text-xs">
-                        <Fuel className="w-3 h-3" />
-                        <span>{fleet.fuel}</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-1.5">
-                        <div 
-                          className="bg-yellow-500 h-1.5 rounded-full"
-                          style={{ width: fleet.fuel }}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Today's Performance */}
+      {/* Simplified Stats Grid - Only Performance Metrics */}
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+        {/* Today's Performance - Updated without fuel efficiency */}
         <Card>
           <CardHeader>
             <CardTitle>Performance Metrics</CardTitle>
@@ -299,54 +264,12 @@ const Dashboard = () => {
               </div>
 
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Fuel Efficiency</span>
-                <span className="text-sm font-bold text-yellow-600">82.1%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-yellow-600 h-2 rounded-full w-[82%]"></div>
-              </div>
-
-              <div className="flex justify-between items-center">
                 <span className="text-sm font-medium">Employee Satisfaction</span>
                 <span className="text-sm font-bold text-purple-600">4.6/5</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div className="bg-purple-600 h-2 rounded-full w-[92%]"></div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Cancellation Analytics */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <XCircle className="w-5 h-5 mr-2" />
-              Cancellation Insights
-            </CardTitle>
-            <CardDescription>
-              Top reasons and trends (Last 30 days)
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {cancellationStats.map((stat, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                    <div>
-                      <span className="text-sm font-medium">{stat.reason}</span>
-                      <div className="text-xs text-gray-500">{stat.count} cases</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-bold">{stat.percentage}%</div>
-                    <div className={`text-xs ${stat.trend.startsWith('+') ? 'text-red-500' : stat.trend.startsWith('-') ? 'text-green-500' : 'text-gray-500'}`}>
-                      {stat.trend}
-                    </div>
-                  </div>
-                </div>
-              ))}
             </div>
           </CardContent>
         </Card>
