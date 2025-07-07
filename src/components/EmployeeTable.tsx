@@ -2,9 +2,8 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Eye } from 'lucide-react';
+import EmployeeActions from './EmployeeActions';
 
 interface Employee {
   id: number;
@@ -24,10 +23,9 @@ interface EmployeeTableProps {
   employees: Employee[];
   onEdit: (employee: Employee) => void;
   onDeactivate: (employee: Employee) => void;
-  onViewDetails?: (employee: Employee) => void;
 }
 
-const EmployeeTable = ({ employees, onEdit, onDeactivate, onViewDetails }: EmployeeTableProps) => {
+const EmployeeTable = ({ employees, onEdit, onDeactivate }: EmployeeTableProps) => {
   return (
     <Card>
       <CardHeader>
@@ -80,14 +78,11 @@ const EmployeeTable = ({ employees, onEdit, onDeactivate, onViewDetails }: Emplo
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onViewDetails?.(employee)}
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      View
-                    </Button>
+                    <EmployeeActions 
+                      employee={employee}
+                      onEdit={onEdit}
+                      onDeactivate={onDeactivate}
+                    />
                   </TableCell>
                 </TableRow>
               ))}

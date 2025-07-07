@@ -9,9 +9,7 @@ import {
 import AddEmployeeForm from '@/components/AddEmployeeForm';
 import EmployeeTable from '@/components/EmployeeTable';
 import EmployeeFilters from '@/components/EmployeeFilters';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
 
 interface Employee {
   id: number;
@@ -28,9 +26,8 @@ interface Employee {
 }
 
 const Employees = () => {
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedFilters, setSelectedFilters] = useState<string[]>(['all']);
+  const [selectedDepartment, setSelectedDepartment] = useState('all');
   const [showAddForm, setShowAddForm] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([
     {
@@ -93,25 +90,8 @@ const Employees = () => {
     const matchesSearch = emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          emp.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          emp.email.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    if (selectedFilters.includes('all')) return matchesSearch;
-    
-    const matchesFilters = selectedFilters.some(filter => {
-      if (departments.includes(filter)) {
-        return emp.department === filter;
-      } else if (filter === 'day') {
-        return emp.shift === 'Day';
-      } else if (filter === 'night') {
-        return emp.shift === 'Night';
-      } else if (filter === 'active') {
-        return emp.status === 'Active';
-      } else if (filter === 'inactive') {
-        return emp.status === 'Inactive';
-      }
-      return false;
-    });
-    
-    return matchesSearch && matchesFilters;
+    const matchesDepartment = selectedDepartment === 'all' || emp.department === selectedDepartment;
+    return matchesSearch && matchesDepartment;
   });
 
   const handleAddEmployee = (data: any) => {
@@ -138,16 +118,13 @@ const Employees = () => {
 
   const handleEditEmployee = (employee: Employee) => {
     console.log('Edit employee:', employee);
+    // Here you would typically open an edit form or navigate to edit page
   };
 
   const handleDeactivateEmployee = (employee: Employee) => {
     setEmployees(employees.map(emp => 
       emp.id === employee.id ? { ...emp, status: 'Inactive' } : emp
     ));
-  };
-
-  const handleViewEmployeeDetails = (employee: Employee) => {
-    navigate(`/employee-profile/${employee.id}`);
   };
 
   const handleDownloadTemplate = () => {
@@ -172,22 +149,32 @@ const Employees = () => {
           <h1 className="text-2xl font-bold text-gray-900">Employee Management</h1>
           <p className="text-gray-600">Manage employee profiles and ride access</p>
         </div>
-        <Button 
-          className="flex items-center gap-2"
-          onClick={() => setShowAddForm(true)}
-        >
-          <Plus className="w-4 h-4" />
-          Add Employee
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" className="flex items-center gap-2" onClick={handleDownloadTemplate}>
+            <Download className="w-4 h-4" />
+            Template
+          </Button>
+          <Button variant="outline" className="flex items-center gap-2" onClick={handleImportCSV}>
+            <Upload className="w-4 h-4" />
+            Import CSV
+          </Button>
+          <Button 
+            className="flex items-center gap-2"
+            onClick={() => setShowAddForm(true)}
+          >
+            <Plus className="w-4 h-4" />
+            Add Employee
+          </Button>
+        </div>
       </div>
 
       {/* Search and Filters */}
       <EmployeeFilters
         searchTerm={searchTerm}
-        selectedFilters={selectedFilters}
+        selectedDepartment={selectedDepartment}
         departments={departments}
         onSearchChange={setSearchTerm}
-        onFiltersChange={setSelectedFilters}
+        onDepartmentChange={setSelectedDepartment}
       />
 
       {/* Employee Table */}
@@ -195,41 +182,13 @@ const Employees = () => {
         employees={filteredEmployees}
         onEdit={handleEditEmployee}
         onDeactivate={handleDeactivateEmployee}
-        onViewDetails={handleViewEmployeeDetails}
       />
 
-      {/* Add Employee Dialog */}
-      <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Add New Employee</DialogTitle>
-            <DialogDescription>
-              Fill in the employee details below or use the quick actions to import data
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-6">
-            {/* Quick Actions */}
-            <div className="flex gap-2 p-4 bg-gray-50 rounded-lg">
-              <Button variant="outline" className="flex items-center gap-2" onClick={handleDownloadTemplate}>
-                <Download className="w-4 h-4" />
-                Download Template
-              </Button>
-              <Button variant="outline" className="flex items-center gap-2" onClick={handleImportCSV}>
-                <Upload className="w-4 h-4" />
-                Upload CSV
-              </Button>
-            </div>
-
-            {/* Add Employee Form */}
-            <AddEmployeeForm 
-              open={showAddForm}
-              onOpenChange={setShowAddForm}
-              onSubmit={handleAddEmployee}
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
+      <AddEmployeeForm 
+        open={showAddForm}
+        onOpenChange={setShowAddForm}
+        onSubmit={handleAddEmployee}
+      />
     </div>
   );
 };

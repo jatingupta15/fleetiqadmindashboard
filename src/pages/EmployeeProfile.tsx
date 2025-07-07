@@ -1,13 +1,14 @@
+
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   ArrowLeft, 
   User, 
+  Car, 
   Calendar, 
   X,
   Phone,
@@ -15,16 +16,14 @@ import {
   MapPin,
   Clock,
   AlertTriangle,
-  Edit
+  Route,
+  Navigation
 } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
 
 const EmployeeProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('details');
-  const [isEditingTripType, setIsEditingTripType] = useState(false);
-  const [tripType, setTripType] = useState('Both');
 
   const employee = {
     id: 1,
@@ -39,17 +38,22 @@ const EmployeeProfile = () => {
     gender: 'Male',
     status: 'Active',
     joinDate: '2023-01-15',
-    emergencyContact: '+91 9876543220',
-    tripType: tripType
+    emergencyContact: '+91 9876543220'
   };
 
-  const handleTripTypeUpdate = (newTripType: string) => {
-    setTripType(newTripType);
-    setIsEditingTripType(false);
-    toast({
-      title: "Trip Type Updated",
-      description: `Trip type changed to ${newTripType}`,
-    });
+  const routingInfo = {
+    currentRoute: 'Noida Sector 62 - Gurgaon Route A',
+    vehicleNumber: 'DL-01-AB-1234',
+    driverName: 'Rajesh Kumar',
+    driverPhone: '+91 9876543210',
+    pickupPoint: 'Sector 62 Metro',
+    dropPoint: 'DLF Cyber City, Gurgaon',
+    departureTime: '08:30 AM',
+    returnTime: '06:30 PM',
+    estimatedDuration: '45 mins',
+    totalDistance: '28 km',
+    seatNumber: 'A-3',
+    routeStatus: 'Active'
   };
 
   const rideHistory = [
@@ -81,22 +85,41 @@ const EmployeeProfile = () => {
       distance: '28 km',
       onTime: false,
       delay: '5 mins'
+    },
+    { 
+      id: 3, 
+      date: '2024-01-13', 
+      pickup: 'Sector 62 Metro', 
+      drop: 'DLF Cyber City', 
+      status: 'Completed', 
+      departureTime: '08:30 AM',
+      arrivalTime: '09:10 AM',
+      actualDuration: '40 mins',
+      vehicle: 'DL-01-AB-1234',
+      driver: 'Rajesh Kumar',
+      distance: '28 km',
+      onTime: true
+    },
+    { 
+      id: 4, 
+      date: '2024-01-12', 
+      pickup: 'DLF Cyber City', 
+      drop: 'Sector 62 Metro', 
+      status: 'Cancelled', 
+      departureTime: '06:30 PM',
+      vehicle: 'DL-01-AB-1234',
+      driver: 'Rajesh Kumar',
+      cancelReason: 'Vehicle breakdown'
     }
   ];
 
   const cancellations = [
     { id: 1, date: '2024-01-12', time: '6:25 PM', reason: 'Sudden illness', withinWindow: false },
-    { id: 2, date: '2024-01-05', time: '9:00 AM', reason: 'Work from home', withinWindow: true }
+    { id: 2, date: '2024-01-05', time: '9:00 AM', reason: 'Work from home', withinWindow: true },
+    { id: 3, date: '2023-12-28', time: '6:30 PM', reason: 'Personal emergency', withinWindow: false },
   ];
 
   const lateCancellations = cancellations.filter(c => c.withinWindow).length;
-
-  const handleCall = (phone: string, name: string) => {
-    toast({
-      title: `Calling ${name}`,
-      description: `Initiating call to ${phone}`,
-    });
-  };
 
   return (
     <div className="space-y-6">
@@ -165,9 +188,10 @@ const EmployeeProfile = () => {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="details">Details</TabsTrigger>
           <TabsTrigger value="history">Ride History</TabsTrigger>
+          <TabsTrigger value="routing">Routing</TabsTrigger>
           <TabsTrigger value="cancellations">Cancellations</TabsTrigger>
         </TabsList>
 
@@ -197,53 +221,6 @@ const EmployeeProfile = () => {
                   <div>
                     <label className="text-sm font-medium text-gray-600">Shift</label>
                     <div className="text-gray-900">{employee.shift}</div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">Trip Type</label>
-                    <div className="flex items-center gap-2">
-                      {!isEditingTripType ? (
-                        <>
-                          <Badge 
-                            className={
-                              employee.tripType === 'Both' 
-                                ? 'bg-green-100 text-green-800' 
-                                : employee.tripType === 'Pickup Only'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-orange-100 text-orange-800'
-                            }
-                          >
-                            {employee.tripType}
-                          </Badge>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => setIsEditingTripType(true)}
-                          >
-                            <Edit className="w-3 h-3" />
-                          </Button>
-                        </>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <Select value={tripType} onValueChange={handleTripTypeUpdate}>
-                            <SelectTrigger className="w-32">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Both">Both</SelectItem>
-                              <SelectItem value="Pickup Only">Pickup Only</SelectItem>
-                              <SelectItem value="Drop Only">Drop Only</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => setIsEditingTripType(false)}
-                          >
-                            <X className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      )}
-                    </div>
                   </div>
                 </div>
                 <div>
@@ -363,8 +340,110 @@ const EmployeeProfile = () => {
                         )}
                       </div>
                     )}
+                    
+                    {ride.status === 'Cancelled' && (
+                      <div className="pt-2 border-t">
+                        <span className="text-sm text-gray-600">Reason:</span>
+                        <div className="text-sm font-medium text-red-600">{ride.cancelReason}</div>
+                      </div>
+                    )}
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="routing" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Route className="w-5 h-5 mr-2" />
+                Current Route Assignment
+              </CardTitle>
+              <CardDescription>Employee's assigned route and vehicle details</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Route Information */}
+                <div className="space-y-4">
+                  <h4 className="font-medium text-gray-900 flex items-center">
+                    <Navigation className="w-4 h-4 mr-2" />
+                    Route Details
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Route Name:</span>
+                      <span className="text-sm font-medium">{routingInfo.currentRoute}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Pickup Point:</span>
+                      <span className="text-sm font-medium">{routingInfo.pickupPoint}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Drop Point:</span>
+                      <span className="text-sm font-medium">{routingInfo.dropPoint}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Seat Number:</span>
+                      <span className="text-sm font-medium">{routingInfo.seatNumber}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Status:</span>
+                      <Badge className="bg-green-100 text-green-800">{routingInfo.routeStatus}</Badge>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Vehicle & Driver Information */}
+                <div className="space-y-4">
+                  <h4 className="font-medium text-gray-900 flex items-center">
+                    <Car className="w-4 h-4 mr-2" />
+                    Vehicle & Driver
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Vehicle Number:</span>
+                      <span className="text-sm font-medium">{routingInfo.vehicleNumber}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Driver Name:</span>
+                      <span className="text-sm font-medium">{routingInfo.driverName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Driver Contact:</span>
+                      <span className="text-sm font-medium">{routingInfo.driverPhone}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Distance:</span>
+                      <span className="text-sm font-medium">{routingInfo.totalDistance}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Est. Duration:</span>
+                      <span className="text-sm font-medium">{routingInfo.estimatedDuration}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Schedule Information */}
+              <div className="pt-4 border-t">
+                <h4 className="font-medium text-gray-900 flex items-center mb-4">
+                  <Clock className="w-4 h-4 mr-2" />
+                  Schedule
+                </h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 bg-blue-50 rounded-lg">
+                    <div className="text-sm text-gray-600">Morning Departure</div>
+                    <div className="text-lg font-bold text-blue-600">{routingInfo.departureTime}</div>
+                    <div className="text-xs text-gray-500">From {routingInfo.pickupPoint}</div>
+                  </div>
+                  <div className="p-3 bg-orange-50 rounded-lg">
+                    <div className="text-sm text-gray-600">Evening Departure</div>
+                    <div className="text-lg font-bold text-orange-600">{routingInfo.returnTime}</div>
+                    <div className="text-xs text-gray-500">From {routingInfo.dropPoint}</div>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
