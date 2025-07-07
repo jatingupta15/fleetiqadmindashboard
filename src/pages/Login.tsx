@@ -4,14 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -21,19 +19,18 @@ const Login = () => {
     
     // Simulate login process
     setTimeout(() => {
-      if (email && password && role) {
+      if (email && password) {
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('userEmail', email);
-        localStorage.setItem('userRole', role);
         toast({
           title: "Login successful",
-          description: `Welcome to FleetPro Dashboard as ${role === 'admin' ? 'Admin' : 'Super Admin'}`,
+          description: "Welcome to FleetPro Dashboard",
         });
         navigate('/dashboard');
       } else {
         toast({
           title: "Login failed",
-          description: "Please enter valid credentials and select a role",
+          description: "Please enter valid credentials",
           variant: "destructive",
         });
       }
@@ -55,18 +52,6 @@ const Login = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="role">Login As</Label>
-              <Select value={role} onValueChange={setRole} required>
-                <SelectTrigger className="transition-all focus:ring-2 focus:ring-indigo-500">
-                  <SelectValue placeholder="Select your role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="super-admin">Super Admin</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
               <Input
