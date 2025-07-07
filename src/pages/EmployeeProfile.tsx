@@ -16,13 +16,14 @@ import {
   AlertTriangle,
   Edit
 } from 'lucide-react';
+import EditEmployeeDialog from '@/components/EditEmployeeDialog';
 
 const EmployeeProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('details');
-
-  const employee = {
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [employee, setEmployee] = useState({
     id: 1,
     code: 'EMP001',
     name: 'John Doe',
@@ -37,7 +38,7 @@ const EmployeeProfile = () => {
     joinDate: '2023-01-15',
     emergencyContact: '+91 9876543220',
     tripType: 'Both'
-  };
+  });
 
   const rideHistory = [
     { 
@@ -104,6 +105,17 @@ const EmployeeProfile = () => {
 
   const lateCancellations = cancellations.filter(c => c.withinWindow).length;
 
+  const handleEditProfile = () => {
+    setShowEditDialog(true);
+  };
+
+  const handleSaveProfile = (data: any) => {
+    setEmployee(prev => ({
+      ...prev,
+      ...data
+    }));
+  };
+
   const getTripTypeBadgeColor = (tripType: string) => {
     switch (tripType) {
       case 'Pickup Only':
@@ -132,7 +144,7 @@ const EmployeeProfile = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleEditProfile}>
             <Edit className="w-4 h-4 mr-2" />
             Edit Profile
           </Button>
@@ -408,6 +420,13 @@ const EmployeeProfile = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <EditEmployeeDialog
+        employee={employee}
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        onSave={handleSaveProfile}
+      />
     </div>
   );
 };
