@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import GoogleLocationPicker from '@/components/GoogleLocationPicker';
 import { User, MapPin, Calendar, Send, Users } from 'lucide-react';
 
@@ -16,6 +17,7 @@ interface EmployeeFormData {
   dropLocation: string;
   rideDate: string;
   rideTime: string;
+  tripType: string;
   reason: string;
   notes: string;
 }
@@ -86,6 +88,29 @@ const EmployeeRequestForm: React.FC<EmployeeRequestFormProps> = ({
             </div>
           </div>
 
+          {/* Trip Type */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-gray-900">Trip Type *</h3>
+            <RadioGroup
+              value={formData.tripType}
+              onValueChange={(value) => onInputChange('tripType', value)}
+              className="grid grid-cols-1 md:grid-cols-3 gap-4"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="pickup-only" id="pickup-only" />
+                <Label htmlFor="pickup-only">Pickup Only</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="drop-only" id="drop-only" />
+                <Label htmlFor="drop-only">Drop Off Only</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="both" id="both" />
+                <Label htmlFor="both">Both Pickup & Drop</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
           {/* Location Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-gray-900 flex items-center">
@@ -93,20 +118,24 @@ const EmployeeRequestForm: React.FC<EmployeeRequestFormProps> = ({
               Location Details
             </h3>
             <div className="space-y-4">
-              <GoogleLocationPicker
-                label="Pickup Location"
-                placeholder="Search for pickup location..."
-                value={formData.pickupLocation}
-                onChange={(value, placeDetails) => onLocationChange('pickupLocation', value, placeDetails)}
-                required
-              />
-              <GoogleLocationPicker
-                label="Drop Location"
-                placeholder="Search for drop location..."
-                value={formData.dropLocation}
-                onChange={(value, placeDetails) => onLocationChange('dropLocation', value, placeDetails)}
-                required
-              />
+              {(formData.tripType === 'pickup-only' || formData.tripType === 'both') && (
+                <GoogleLocationPicker
+                  label="Pickup Location"
+                  placeholder="Search for pickup location..."
+                  value={formData.pickupLocation}
+                  onChange={(value, placeDetails) => onLocationChange('pickupLocation', value, placeDetails)}
+                  required
+                />
+              )}
+              {(formData.tripType === 'drop-only' || formData.tripType === 'both') && (
+                <GoogleLocationPicker
+                  label="Drop Location"
+                  placeholder="Search for drop location..."
+                  value={formData.dropLocation}
+                  onChange={(value, placeDetails) => onLocationChange('dropLocation', value, placeDetails)}
+                  required
+                />
+              )}
             </div>
           </div>
 

@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import EmployeeRequestForm from '@/components/EmployeeRequestForm';
 import VipBookingForm from '@/components/VipBookingForm';
 import RequestStatusCard from '@/components/RequestStatusCard';
+import RequestPreviewDialog from '@/components/RequestPreviewDialog';
 import VipRequestInfo from '@/components/VipRequestInfo';
 import { Users, Car } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
@@ -32,12 +33,17 @@ const SpecialRides = () => {
     dropLocation: '',
     rideDate: '',
     rideTime: '',
+    tripType: 'both',
     reason: '',
     notes: ''
   });
 
+  // Preview Dialog State
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
   // Employee Booking Requests
-  const [bookingRequests] = useState([
+  const [bookingRequests, setBookingRequests] = useState([
     {
       id: 1,
       employeeName: 'Sarah Smith',
@@ -47,6 +53,7 @@ const SpecialRides = () => {
       dropLocation: 'Airport Terminal 3',
       rideDate: '2024-01-20',
       rideTime: '14:00',
+      tripType: 'both',
       reason: 'Client meeting in Mumbai',
       status: 'pending',
       requestDate: '2024-01-15',
@@ -61,6 +68,7 @@ const SpecialRides = () => {
       dropLocation: 'Bangalore Railway Station',
       rideDate: '2024-01-18',
       rideTime: '06:30',
+      tripType: 'pickup-only',
       reason: 'Personal emergency - family member hospitalization',
       status: 'approved',
       requestDate: '2024-01-14',
@@ -75,6 +83,7 @@ const SpecialRides = () => {
       dropLocation: 'Max Hospital, Saket',
       rideDate: '2024-01-16',
       rideTime: '10:00',
+      tripType: 'drop-only',
       reason: 'Medical appointment',
       status: 'declined',
       requestDate: '2024-01-13',
@@ -115,6 +124,7 @@ const SpecialRides = () => {
       dropLocation: '',
       rideDate: '',
       rideTime: '',
+      tripType: 'both',
       reason: '',
       notes: ''
     });
@@ -136,6 +146,21 @@ const SpecialRides = () => {
   const handleEmpLocationChange = (field: string, value: string, placeDetails?: any) => {
     setEmpFormData(prev => ({ ...prev, [field]: value }));
     console.log('Employee Location selected:', { field, value, placeDetails });
+  };
+
+  const handleRequestClick = (request) => {
+    setSelectedRequest(request);
+    setIsPreviewOpen(true);
+  };
+
+  const handleRequestSave = (updatedRequest) => {
+    setBookingRequests(prev => 
+      prev.map(req => req.id === updatedRequest.id ? updatedRequest : req)
+    );
+    toast({
+      title: "Request Updated",
+      description: "The booking request has been successfully updated",
+    });
   };
 
   return (
@@ -178,12 +203,18 @@ const SpecialRides = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>Recent Requests</CardTitle>
-                  <CardDescription>Your submitted booking requests</CardDescription>
+                  <CardDescription>Click on any request to view details</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     {bookingRequests.map((request) => (
-                      <RequestStatusCard key={request.id} request={request} />
+                      <div 
+                        key={request.id} 
+                        onClick={() => handleRequestClick(request)}
+                        className="cursor-pointer hover:bg-gray-50 rounded-lg transition-colors"
+                      >
+                        <RequestStatusCard request={request} />
+                      </div>
                     ))}
                   </div>
                 </CardContent>
@@ -210,6 +241,17 @@ const SpecialRides = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Request Preview Dialog */}
+      <RequestPreviewDialog
+        request={selectedRequest}
+        isOpen={isPreviewOpen}
+        onClose={() => {
+          setIsPreviewOpen(false);
+          setSelectedRequest(null);
+        }}
+        onSave={handleRequestSave}
+      />
     </div>
   );
 };
