@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { Card, CardHeader } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Filter } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Search } from 'lucide-react';
 
 interface EmployeeFiltersProps {
   searchTerm: string;
@@ -20,6 +20,52 @@ const EmployeeFilters = ({
   onSearchChange, 
   onDepartmentChange 
 }: EmployeeFiltersProps) => {
+  const filterOptions = [
+    { label: 'All Filters', value: 'all' },
+    { label: 'Department', value: 'department' },
+    { label: 'Shift', value: 'shift' },
+    { label: 'Status', value: 'status' },
+    { label: 'Trip Type', value: 'tripType' },
+    { label: 'Gender', value: 'gender' },
+  ];
+
+  const getFilterContent = (filterType: string) => {
+    switch (filterType) {
+      case 'department':
+        return departments.map(dept => (
+          <SelectItem key={dept} value={dept}>
+            {dept === 'all' ? 'All Departments' : dept}
+          </SelectItem>
+        ));
+      case 'shift':
+        return ['All Shifts', 'Day', 'Night'].map(shift => (
+          <SelectItem key={shift} value={shift.toLowerCase().replace(' ', '')}>
+            {shift}
+          </SelectItem>
+        ));
+      case 'status':
+        return ['All Status', 'Active', 'Inactive'].map(status => (
+          <SelectItem key={status} value={status.toLowerCase().replace(' ', '')}>
+            {status}
+          </SelectItem>
+        ));
+      case 'tripType':
+        return ['All Trip Types', 'Both', 'Pickup Only', 'Drop Only'].map(type => (
+          <SelectItem key={type} value={type.toLowerCase().replace(' ', '')}>
+            {type}
+          </SelectItem>
+        ));
+      case 'gender':
+        return ['All Genders', 'Male', 'Female', 'Other'].map(gender => (
+          <SelectItem key={gender} value={gender.toLowerCase().replace(' ', '')}>
+            {gender}
+          </SelectItem>
+        ));
+      default:
+        return null;
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -35,23 +81,31 @@ const EmployeeFilters = ({
             />
           </div>
           
-          {/* Department Filter */}
-          <select
-            value={selectedDepartment}
-            onChange={(e) => onDepartmentChange(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            {departments.map(dept => (
-              <option key={dept} value={dept}>
-                {dept === 'all' ? 'All Departments' : dept}
-              </option>
-            ))}
-          </select>
-          
-          <Button variant="outline" size="sm">
-            <Filter className="w-4 h-4 mr-2" />
-            More Filters
-          </Button>
+          {/* Unified Filters Dropdown */}
+          <Select value={selectedDepartment} onValueChange={onDepartmentChange}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Select filters" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Filters</SelectItem>
+              <SelectItem disabled className="font-medium text-gray-900">Department</SelectItem>
+              {departments.slice(1).map(dept => (
+                <SelectItem key={`dept-${dept}`} value={dept} className="pl-6">
+                  {dept}
+                </SelectItem>
+              ))}
+              <SelectItem disabled className="font-medium text-gray-900">Shift</SelectItem>
+              <SelectItem value="day" className="pl-6">Day Shift</SelectItem>
+              <SelectItem value="night" className="pl-6">Night Shift</SelectItem>
+              <SelectItem disabled className="font-medium text-gray-900">Status</SelectItem>
+              <SelectItem value="active" className="pl-6">Active</SelectItem>
+              <SelectItem value="inactive" className="pl-6">Inactive</SelectItem>
+              <SelectItem disabled className="font-medium text-gray-900">Trip Type</SelectItem>
+              <SelectItem value="both" className="pl-6">Both</SelectItem>
+              <SelectItem value="pickup" className="pl-6">Pickup Only</SelectItem>
+              <SelectItem value="drop" className="pl-6">Drop Only</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </CardHeader>
     </Card>

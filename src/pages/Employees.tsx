@@ -9,6 +9,7 @@ import {
 import AddEmployeeForm from '@/components/AddEmployeeForm';
 import EmployeeTable from '@/components/EmployeeTable';
 import EmployeeFilters from '@/components/EmployeeFilters';
+import EmployeeSideDrawer from '@/components/EmployeeSideDrawer';
 import { toast } from '@/hooks/use-toast';
 
 interface Employee {
@@ -29,6 +30,8 @@ const Employees = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [showSideDrawer, setShowSideDrawer] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([
     {
       id: 1,
@@ -90,8 +93,23 @@ const Employees = () => {
     const matchesSearch = emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          emp.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          emp.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDepartment = selectedDepartment === 'all' || emp.department === selectedDepartment;
-    return matchesSearch && matchesDepartment;
+    
+    let matchesFilter = true;
+    if (selectedDepartment !== 'all') {
+      if (departments.includes(selectedDepartment)) {
+        matchesFilter = emp.department === selectedDepartment;
+      } else if (selectedDepartment === 'day') {
+        matchesFilter = emp.shift === 'Day';
+      } else if (selectedDepartment === 'night') {
+        matchesFilter = emp.shift === 'Night';
+      } else if (selectedDepartment === 'active') {
+        matchesFilter = emp.status === 'Active';
+      } else if (selectedDepartment === 'inactive') {
+        matchesFilter = emp.status === 'Inactive';
+      }
+    }
+    
+    return matchesSearch && matchesFilter;
   });
 
   const handleAddEmployee = (data: any) => {
@@ -118,13 +136,17 @@ const Employees = () => {
 
   const handleEditEmployee = (employee: Employee) => {
     console.log('Edit employee:', employee);
-    // Here you would typically open an edit form or navigate to edit page
   };
 
   const handleDeactivateEmployee = (employee: Employee) => {
     setEmployees(employees.map(emp => 
       emp.id === employee.id ? { ...emp, status: 'Inactive' } : emp
     ));
+  };
+
+  const handleViewEmployeeDetails = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setShowSideDrawer(true);
   };
 
   const handleDownloadTemplate = () => {
@@ -182,12 +204,19 @@ const Employees = () => {
         employees={filteredEmployees}
         onEdit={handleEditEmployee}
         onDeactivate={handleDeactivateEmployee}
+        onViewDetails={handleViewEmployeeDetails}
       />
 
       <AddEmployeeForm 
         open={showAddForm}
         onOpenChange={setShowAddForm}
         onSubmit={handleAddEmployee}
+      />
+
+      <EmployeeSideDrawer
+        employee={selectedEmployee}
+        isOpen={showSideDrawer}
+        onClose={() => setShowSideDrawer(false)}
       />
     </div>
   );

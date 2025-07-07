@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { 
   Route, 
   MapPin, 
@@ -10,8 +11,11 @@ import {
   User,
   Search,
   Car,
-  Users
+  Users,
+  Map,
+  Navigation
 } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 const Routing = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -22,10 +26,12 @@ const Routing = () => {
       id: 1,
       routeName: 'Noida Sector 62 - Gurgaon Route A',
       vehicleNumber: 'DL-01-AB-1234',
+      cabName: 'Swift Dzire',
+      cabCode: 'SDZ-001',
       driverName: 'Rajesh Kumar',
       driverPhone: '+91 9876543210',
-      vehicleCapacity: 12,
-      assignedEmployees: 8,
+      vehicleCapacity: 4,
+      assignedEmployees: 3,
       pickupPoints: ['Sector 62 Metro', 'Sector 18 Mall', 'Botanical Garden'],
       dropPoint: 'DLF Cyber City, Gurgaon',
       departureTime: '08:30 AM',
@@ -35,22 +41,19 @@ const Routing = () => {
       employees: [
         { id: 1, name: 'Sarah Smith', empId: 'EMP002', pickup: 'Sector 62 Metro' },
         { id: 2, name: 'John Doe', empId: 'EMP001', pickup: 'Sector 18 Mall' },
-        { id: 3, name: 'Mike Wilson', empId: 'EMP003', pickup: 'Sector 62 Metro' },
-        { id: 4, name: 'Lisa Chen', empId: 'EMP004', pickup: 'Botanical Garden' },
-        { id: 5, name: 'David Kumar', empId: 'EMP007', pickup: 'Sector 18 Mall' },
-        { id: 6, name: 'Anna Patel', empId: 'EMP008', pickup: 'Sector 62 Metro' },
-        { id: 7, name: 'Tom Brown', empId: 'EMP009', pickup: 'Botanical Garden' },
-        { id: 8, name: 'Emma Davis', empId: 'EMP010', pickup: 'Sector 18 Mall' }
+        { id: 3, name: 'Mike Wilson', empId: 'EMP003', pickup: 'Botanical Garden' }
       ]
     },
     {
       id: 2,
       routeName: 'Whitefield - Electronic City Route B',
       vehicleNumber: 'KA-05-CD-5678',
+      cabName: 'Honda City',
+      cabCode: 'HCT-002',
       driverName: 'Suresh Reddy',
       driverPhone: '+91 9876543211',
-      vehicleCapacity: 15,
-      assignedEmployees: 12,
+      vehicleCapacity: 4,
+      assignedEmployees: 4,
       pickupPoints: ['Whitefield IT Park', 'Marathahalli Bridge', 'Silk Board'],
       dropPoint: 'Electronic City Phase 1',
       departureTime: '09:00 AM',
@@ -68,10 +71,12 @@ const Routing = () => {
       id: 3,
       routeName: 'Andheri - BKC Route C',
       vehicleNumber: 'MH-12-EF-9012',
+      cabName: 'Hyundai Verna',
+      cabCode: 'HVN-003',
       driverName: 'Ramesh Patil',
       driverPhone: '+91 9876543212',
-      vehicleCapacity: 10,
-      assignedEmployees: 7,
+      vehicleCapacity: 4,
+      assignedEmployees: 2,
       pickupPoints: ['Andheri Station', 'MIDC', 'Seepz'],
       dropPoint: 'Bandra Kurla Complex',
       departureTime: '08:45 AM',
@@ -80,8 +85,7 @@ const Routing = () => {
       area: 'Mumbai',
       employees: [
         { id: 13, name: 'Neha Joshi', empId: 'EMP014', pickup: 'Andheri Station' },
-        { id: 14, name: 'Arjun Mehta', empId: 'EMP015', pickup: 'MIDC' },
-        { id: 15, name: 'Pooja Singh', empId: 'EMP016', pickup: 'Seepz' }
+        { id: 14, name: 'Arjun Mehta', empId: 'EMP015', pickup: 'MIDC' }
       ]
     }
   ];
@@ -89,12 +93,21 @@ const Routing = () => {
   const filteredRoutes = routes.filter(route => {
     const matchesSearch = route.routeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          route.vehicleNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         route.driverName.toLowerCase().includes(searchTerm.toLowerCase());
+                         route.driverName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         route.cabName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         route.cabCode.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesArea = areaFilter === 'all' || route.area.toLowerCase().includes(areaFilter.toLowerCase());
     return matchesSearch && matchesArea;
   });
 
   const areas = ['all', 'Noida-Gurgaon', 'Bangalore', 'Mumbai'];
+
+  const handleViewOnMap = (route: any) => {
+    toast({
+      title: "Opening Route Map",
+      description: `Viewing ${route.routeName} on map with pickup and drop points`,
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -102,7 +115,7 @@ const Routing = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Smart Routing</h1>
-          <p className="text-gray-600">View optimized route assignments and vehicle details</p>
+          <p className="text-gray-600">Optimized route assignments with best routing solutions for each area</p>
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="secondary" className="bg-blue-100 text-blue-800">
@@ -118,7 +131,7 @@ const Routing = () => {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
-                placeholder="Search routes, vehicles, or drivers..."
+                placeholder="Search routes, vehicles, cabs, or drivers..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -155,9 +168,20 @@ const Routing = () => {
                     <CardDescription>{route.area}</CardDescription>
                   </div>
                 </div>
-                <Badge className="bg-green-100 text-green-800">
-                  {route.assignedEmployees}/{route.vehicleCapacity} seats
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge className={`${route.assignedEmployees === route.vehicleCapacity ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                    {route.assignedEmployees}/{route.vehicleCapacity} seats
+                  </Badge>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleViewOnMap(route)}
+                    className="flex items-center gap-1"
+                  >
+                    <Map className="w-4 h-4" />
+                    View Route
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -170,7 +194,15 @@ const Routing = () => {
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Vehicle:</span>
+                      <span className="text-sm text-gray-600">Cab Name:</span>
+                      <span className="text-sm font-medium">{route.cabName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Cab Code:</span>
+                      <span className="text-sm font-medium">{route.cabCode}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Vehicle No:</span>
                       <span className="text-sm font-medium">{route.vehicleNumber}</span>
                     </div>
                     <div className="flex justify-between">
@@ -241,6 +273,13 @@ const Routing = () => {
                         <div className="text-xs text-gray-600">{employee.pickup}</div>
                       </div>
                     ))}
+                    {route.assignedEmployees < route.vehicleCapacity && (
+                      <div className="p-2 bg-blue-50 rounded border-2 border-dashed border-blue-200">
+                        <div className="text-xs text-blue-600 text-center">
+                          {route.vehicleCapacity - route.assignedEmployees} seat(s) available
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

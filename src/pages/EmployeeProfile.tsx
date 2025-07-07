@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   ArrowLeft, 
   User, 
@@ -16,13 +17,17 @@ import {
   Clock,
   AlertTriangle,
   Route,
-  Navigation
+  Navigation,
+  Edit
 } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 const EmployeeProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('details');
+  const [isEditingTripType, setIsEditingTripType] = useState(false);
+  const [tripType, setTripType] = useState('Both');
 
   const employee = {
     id: 1,
@@ -38,7 +43,16 @@ const EmployeeProfile = () => {
     status: 'Active',
     joinDate: '2023-01-15',
     emergencyContact: '+91 9876543220',
-    tripType: 'Both'
+    tripType: tripType
+  };
+
+  const handleTripTypeUpdate = (newTripType: string) => {
+    setTripType(newTripType);
+    setIsEditingTripType(false);
+    toast({
+      title: "Trip Type Updated",
+      description: `Trip type changed to ${newTripType}`,
+    });
   };
 
   const routingInfo = {
@@ -85,41 +99,22 @@ const EmployeeProfile = () => {
       distance: '28 km',
       onTime: false,
       delay: '5 mins'
-    },
-    { 
-      id: 3, 
-      date: '2024-01-13', 
-      pickup: 'Sector 62 Metro', 
-      drop: 'DLF Cyber City', 
-      status: 'Completed', 
-      departureTime: '08:30 AM',
-      arrivalTime: '09:10 AM',
-      actualDuration: '40 mins',
-      vehicle: 'DL-01-AB-1234',
-      driver: 'Rajesh Kumar',
-      distance: '28 km',
-      onTime: true
-    },
-    { 
-      id: 4, 
-      date: '2024-01-12', 
-      pickup: 'DLF Cyber City', 
-      drop: 'Sector 62 Metro', 
-      status: 'Cancelled', 
-      departureTime: '06:30 PM',
-      vehicle: 'DL-01-AB-1234',
-      driver: 'Rajesh Kumar',
-      cancelReason: 'Vehicle breakdown'
     }
   ];
 
   const cancellations = [
     { id: 1, date: '2024-01-12', time: '6:25 PM', reason: 'Sudden illness', withinWindow: false },
-    { id: 2, date: '2024-01-05', time: '9:00 AM', reason: 'Work from home', withinWindow: true },
-    { id: 3, date: '2023-12-28', time: '6:30 PM', reason: 'Personal emergency', withinWindow: false },
+    { id: 2, date: '2024-01-05', time: '9:00 AM', reason: 'Work from home', withinWindow: true }
   ];
 
   const lateCancellations = cancellations.filter(c => c.withinWindow).length;
+
+  const handleCall = (phone: string, name: string) => {
+    toast({
+      title: `Calling ${name}`,
+      description: `Initiating call to ${phone}`,
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -224,18 +219,49 @@ const EmployeeProfile = () => {
                   </div>
                   <div>
                     <label className="text-sm font-medium text-gray-600">Trip Type</label>
-                    <div className="text-gray-900">
-                      <Badge 
-                        className={
-                          employee.tripType === 'Both' 
-                            ? 'bg-green-100 text-green-800' 
-                            : employee.tripType === 'Pickup Only'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-orange-100 text-orange-800'
-                        }
-                      >
-                        {employee.tripType}
-                      </Badge>
+                    <div className="flex items-center gap-2">
+                      {!isEditingTripType ? (
+                        <>
+                          <Badge 
+                            className={
+                              employee.tripType === 'Both' 
+                                ? 'bg-green-100 text-green-800' 
+                                : employee.tripType === 'Pickup Only'
+                                ? 'bg-blue-100 text-blue-800'
+                                : 'bg-orange-100 text-orange-800'
+                            }
+                          >
+                            {employee.tripType}
+                          </Badge>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => setIsEditingTripType(true)}
+                          >
+                            <Edit className="w-3 h-3" />
+                          </Button>
+                        </>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <Select value={tripType} onValueChange={handleTripTypeUpdate}>
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Both">Both</SelectItem>
+                              <SelectItem value="Pickup Only">Pickup Only</SelectItem>
+                              <SelectItem value="Drop Only">Drop Only</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => setIsEditingTripType(false)}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -354,13 +380,6 @@ const EmployeeProfile = () => {
                             Late Arrival
                           </Badge>
                         )}
-                      </div>
-                    )}
-                    
-                    {ride.status === 'Cancelled' && (
-                      <div className="pt-2 border-t">
-                        <span className="text-sm text-gray-600">Reason:</span>
-                        <div className="text-sm font-medium text-red-600">{ride.cancelReason}</div>
                       </div>
                     )}
                   </div>

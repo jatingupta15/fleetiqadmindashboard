@@ -1,9 +1,10 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   AlertTriangle, 
   MapPin, 
@@ -12,12 +13,17 @@ import {
   User,
   Car,
   MessageSquare,
-  CheckCircle
+  CheckCircle,
+  X
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 const SOSAlerts = () => {
   const [activeTab, setActiveTab] = useState('active');
+  const [showResolveDialog, setShowResolveDialog] = useState(false);
+  const [resolveReason, setResolveReason] = useState('');
+  const [resolveNotes, setResolveNotes] = useState('');
+  const [showAlert, setShowAlert] = useState(true);
 
   const activeAlerts = [
     {
@@ -57,7 +63,8 @@ const SOSAlerts = () => {
       vehicle: 'KA 05 CD 5678',
       status: 'resolved',
       resolutionTime: '5 minutes',
-      resolutionNotes: 'False alarm - employee accidentally triggered SOS. All safe.'
+      resolutionReason: 'False Alarm',
+      resolutionNotes: 'Employee accidentally triggered SOS. All safe.'
     },
     {
       id: 3,
@@ -73,8 +80,19 @@ const SOSAlerts = () => {
       vehicle: 'KA 01 EF 9012',
       status: 'resolved',
       resolutionTime: '12 minutes',
+      resolutionReason: 'Vehicle Breakdown',
       resolutionNotes: 'Vehicle breakdown. Employee safely transferred to backup vehicle. Breakdown service contacted.'
     }
+  ];
+
+  const resolveReasons = [
+    'False Alarm',
+    'Vehicle Breakdown',
+    'Health Emergency',
+    'Accident',
+    'Security Concern',
+    'Weather Related',
+    'Other'
   ];
 
   const handleCall = (phone: string, name: string) => {
@@ -84,10 +102,29 @@ const SOSAlerts = () => {
     });
   };
 
-  const handleResolve = (alertId: number) => {
+  const handleDismissAlert = () => {
+    setShowAlert(false);
+    toast({
+      title: "Alert Dismissed",
+      description: "SOS alert banner has been dismissed",
+    });
+  };
+
+  const handleResolve = () => {
+    if (!resolveReason) {
+      toast({
+        title: "Resolution Reason Required",
+        description: "Please select a reason for resolving this SOS alert",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setShowResolveDialog(false);
+    setShowAlert(false);
     toast({
       title: "Alert Resolved",
-      description: "SOS alert has been marked as resolved",
+      description: `SOS alert resolved as: ${resolveReason}`,
     });
   };
 
@@ -111,7 +148,7 @@ const SOSAlerts = () => {
           <p className="text-gray-600">Monitor and respond to emergency alerts from employees</p>
         </div>
         <div className="flex items-center gap-2">
-          {activeAlerts.length > 0 && (
+          {activeAlerts.length > 0 && showAlert && (
             <Badge variant="destructive" className="animate-pulse">
               {activeAlerts.length} Active Alert{activeAlerts.length > 1 ? 's' : ''}
             </Badge>
@@ -120,9 +157,17 @@ const SOSAlerts = () => {
       </div>
 
       {/* Active Alert Banner */}
-      {activeAlerts.length > 0 && (
-        <div className="bg-red-600 text-white p-4 rounded-lg border border-red-700">
-          <div className="flex items-center justify-between">
+      {activeAlerts.length > 0 && showAlert && (
+        <div className="bg-red-600 text-white p-4 rounded-lg border border-red-700 relative">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleDismissAlert}
+            className="absolute top-2 right-2 text-white hover:bg-red-700"
+          >
+            <X className="w-4 h-4" />
+          </Button>
+          <div className="flex items-center justify-between pr-8">
             <div className="flex items-center space-x-3">
               <AlertTriangle className="w-6 h-6 animate-pulse" />
               <div>
@@ -262,7 +307,7 @@ const SOSAlerts = () => {
                         </div>
                         
                         <Button
-                          onClick={() => handleResolve(alert.id)}
+                          onClick={() => setShowResolveDialog(true)}
                           className="w-full bg-green-600 hover:bg-green-700"
                         >
                           <CheckCircle className="w-4 h-4 mr-2" />
@@ -313,7 +358,7 @@ const SOSAlerts = () => {
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                       <div>
                         <div className="font-medium text-gray-700">Location:</div>
                         <div className="text-gray-600">{alert.location}</div>
@@ -321,6 +366,10 @@ const SOSAlerts = () => {
                       <div>
                         <div className="font-medium text-gray-700">Resolution Time:</div>
                         <div className="text-gray-600">{alert.resolutionTime}</div>
+                      </div>
+                      <div>
+                        <div className="font-medium text-gray-700">Resolution Reason:</div>
+                        <div className="text-gray-600">{alert.resolutionReason}</div>
                       </div>
                     </div>
                     
@@ -339,6 +388,62 @@ const SOSAlerts = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Resolve Dialog */}
+      {showResolveDialog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md mx-4">
+            <CardHeader>
+              <CardTitle>Resolve SOS Alert</CardTitle>
+              <CardDescription>Please provide the reason for resolving this alert</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700">Resolution Reason *</label>
+                <Select value={resolveReason} onValueChange={setResolveReason}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select a reason" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {resolveReasons.map((reason) => (
+                      <SelectItem key={reason} value={reason}>
+                        {reason}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium text-gray-700">Additional Notes</label>
+                <Textarea
+                  value={resolveNotes}
+                  onChange={(e) => setResolveNotes(e.target.value)}
+                  placeholder="Provide additional details about the resolution..."
+                  className="mt-1"
+                  rows={3}
+                />
+              </div>
+              
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowResolveDialog(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleResolve}
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                >
+                  Resolve Alert
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
