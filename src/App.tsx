@@ -16,6 +16,7 @@ import SOSAlerts from "./pages/SOSAlerts";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
 import Notifications from "./pages/Notifications";
+import AIAssistant from "./pages/AIAssistant";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -63,7 +64,8 @@ const App = () => (
             <Route path="/sos-alerts" element={<SOSAlerts />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/settings" element={<Settings />} />
-            <Route path="/notifications" element={<Notifications />} />
+                <Route path="/notifications" element={<Notifications />} />
+                <Route path="/ai-assistant" element={<AIAssistant />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

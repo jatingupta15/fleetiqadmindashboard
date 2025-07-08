@@ -12,7 +12,8 @@ import {
   AlertTriangle,
   Menu,
   Plus,
-  Route
+  Route,
+  Bot
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -27,6 +28,7 @@ const DashboardLayout = () => {
     { path: '/dashboard', label: 'Dashboard', icon: BarChart3 },
     { path: '/employees', label: 'Employees', icon: Users },
     { path: '/routing', label: 'Smart Routing', icon: Route },
+    { path: '/ai-assistant', label: 'AI Assistant', icon: Bot },
     { path: '/special-rides', label: 'Special Rides', icon: Plus },
     { path: '/sos-alerts', label: 'SOS Alerts', icon: AlertTriangle, badge: sosActive ? '1' : undefined },
     { path: '/analytics', label: 'Analytics', icon: BarChart3 },
