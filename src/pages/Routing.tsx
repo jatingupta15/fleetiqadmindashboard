@@ -19,6 +19,7 @@ import RouteMapView from '@/components/RouteMapView';
 const Routing = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [areaFilter, setAreaFilter] = useState('all');
+  const [timeFilter, setTimeFilter] = useState('today');
   const [selectedRoute, setSelectedRoute] = useState<any>(null);
 
   const routes = [
@@ -107,6 +108,12 @@ const Routing = () => {
   });
 
   const areas = ['all', 'Noida-Gurgaon', 'Bangalore', 'Mumbai'];
+  const timeFilters = [
+    { value: 'today', label: 'Today' },
+    { value: 'this_week', label: 'This Week' },
+    { value: 'this_month', label: 'This Month' },
+    { value: 'custom', label: 'Custom' }
+  ];
 
   return (
     <div className="space-y-6">
@@ -145,6 +152,18 @@ const Routing = () => {
               {areas.map(area => (
                 <option key={area} value={area}>
                   {area === 'all' ? 'All Areas' : area}
+                </option>
+              ))}
+            </select>
+            
+            <select
+              value={timeFilter}
+              onChange={(e) => setTimeFilter(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              {timeFilters.map(filter => (
+                <option key={filter.value} value={filter.value}>
+                  {filter.label}
                 </option>
               ))}
             </select>

@@ -98,9 +98,45 @@ const EmployeeProfile = () => {
   ];
 
   const cancellations = [
-    { id: 1, date: '2024-01-12', time: '6:25 PM', reason: 'Sudden illness', withinWindow: false },
-    { id: 2, date: '2024-01-05', time: '9:00 AM', reason: 'Work from home', withinWindow: true },
-    { id: 3, date: '2023-12-28', time: '6:30 PM', reason: 'Personal emergency', withinWindow: false },
+    { 
+      id: 1, 
+      date: '2024-01-12', 
+      time: '6:25 PM', 
+      reason: 'Sudden illness', 
+      withinWindow: false,
+      cabId: 'CAB001',
+      cabNumber: 'DL-01-AB-1234',
+      route: 'Noida Sector 62 - Gurgaon Route A',
+      driverName: 'Rajesh Kumar',
+      loginLocation: 'Sector 62 Metro',
+      logoutLocation: 'DLF Cyber City'
+    },
+    { 
+      id: 2, 
+      date: '2024-01-05', 
+      time: '9:00 AM', 
+      reason: 'Work from home', 
+      withinWindow: true,
+      cabId: 'CAB001',
+      cabNumber: 'DL-01-AB-1234',
+      route: 'Noida Sector 62 - Gurgaon Route A',
+      driverName: 'Rajesh Kumar',
+      loginLocation: 'Sector 62 Metro',
+      logoutLocation: 'DLF Cyber City'
+    },
+    { 
+      id: 3, 
+      date: '2023-12-28', 
+      time: '6:30 PM', 
+      reason: 'Personal emergency', 
+      withinWindow: false,
+      cabId: 'CAB002',
+      cabNumber: 'KA-05-CD-5678',
+      route: 'Whitefield - Electronic City Route B',
+      driverName: 'Suresh Reddy',
+      loginLocation: 'Whitefield IT Park',
+      logoutLocation: 'Electronic City Phase 1'
+    },
   ];
 
   const lateCancellations = cancellations.filter(c => c.withinWindow).length;
@@ -410,6 +446,34 @@ const EmployeeProfile = () => {
                         </div>
                         <div className="text-sm text-gray-600">
                           <span className="font-medium">Reason:</span> {cancellation.reason}
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm mt-3">
+                          <div>
+                            <span className="text-gray-600">Cab ID:</span>
+                            <div className="font-medium">{cancellation.cabId}</div>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">Cab Number:</span>
+                            <div className="font-medium">{cancellation.cabNumber}</div>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">Driver:</span>
+                            <div className="font-medium">{cancellation.driverName}</div>
+                          </div>
+                        </div>
+                        <div className="mt-2">
+                          <span className="text-gray-600 text-sm">Route:</span>
+                          <div className="font-medium text-sm">{cancellation.route}</div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 text-sm mt-2">
+                          <div>
+                            <span className="text-gray-600">Login Location:</span>
+                            <div className="font-medium">{cancellation.loginLocation}</div>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">Logout Location:</span>
+                            <div className="font-medium">{cancellation.logoutLocation}</div>
+                          </div>
                         </div>
                       </div>
                     </div>
