@@ -12,17 +12,20 @@ import {
   Search,
   Car,
   Users,
-  Eye
+  Eye,
+  Edit
 } from 'lucide-react';
 import RouteMapView from '@/components/RouteMapView';
+import EditRouteDialog from '@/components/EditRouteDialog';
 
 const Routing = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [areaFilter, setAreaFilter] = useState('all');
   const [timeFilter, setTimeFilter] = useState('today');
   const [selectedRoute, setSelectedRoute] = useState<any>(null);
+  const [editingRoute, setEditingRoute] = useState<any>(null);
 
-  const routes = [
+  const [routes, setRoutes] = useState([
     {
       id: 1,
       routeName: 'Noida Sector 62 - Gurgaon Route A',
@@ -95,7 +98,13 @@ const Routing = () => {
         { id: 15, name: 'Pooja Singh', empId: 'EMP016', pickup: 'Seepz' }
       ]
     }
-  ];
+  ]);
+
+  const handleSaveRoute = (updatedRoute: any) => {
+    setRoutes(routes.map(route => 
+      route.id === updatedRoute.id ? updatedRoute : route
+    ));
+  };
 
   const filteredRoutes = routes.filter(route => {
     const matchesSearch = route.routeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -195,6 +204,15 @@ const Routing = () => {
                   <Badge className="bg-green-100 text-green-800">
                     {route.assignedEmployees}/{route.vehicleCapacity} seats
                   </Badge>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setEditingRoute(route)}
+                    className="flex items-center gap-1"
+                  >
+                    <Edit className="w-4 h-4" />
+                    Edit Route
+                  </Button>
                   <Button
                     variant="outline"
                     size="sm"
@@ -309,6 +327,16 @@ const Routing = () => {
         <RouteMapView
           route={selectedRoute}
           onClose={() => setSelectedRoute(null)}
+        />
+      )}
+
+      {/* Edit Route Modal */}
+      {editingRoute && (
+        <EditRouteDialog
+          route={editingRoute}
+          open={!!editingRoute}
+          onClose={() => setEditingRoute(null)}
+          onSave={handleSaveRoute}
         />
       )}
     </div>
