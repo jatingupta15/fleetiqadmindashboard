@@ -1,22 +1,12 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { 
-  Route, 
-  MapPin, 
-  Clock, 
-  User,
-  Search,
-  Car,
-  Users,
-  Eye,
-  Edit
-} from 'lucide-react';
+import { Search } from 'lucide-react';
 import RouteMapView from '@/components/RouteMapView';
 import EditRouteDialog from '@/components/EditRouteDialog';
+import RouteCard from '@/components/RouteCard';
 
 const Routing = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -183,149 +173,12 @@ const Routing = () => {
       {/* Routes List */}
       <div className="grid gap-6">
         {filteredRoutes.map((route) => (
-          <Card key={route.id} className="overflow-hidden border-0 shadow-sm hover:shadow-md transition-all duration-200 bg-white">
-            {/* Route Header */}
-            <div className="bg-gradient-to-r from-primary/5 to-primary/10 px-6 py-4 border-b border-border/50">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                    <Route className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground">{route.routeName}</h3>
-                    <div className="flex items-center gap-3 mt-1">
-                      <span className="text-sm text-muted-foreground">{route.area}</span>
-                      <Badge variant="secondary" className="text-xs">
-                        {route.cabName} • {route.vendorCode}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
-                    {route.assignedEmployees}/{route.vehicleCapacity} seats
-                  </Badge>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSelectedRoute(route)}
-                    className="gap-2"
-                  >
-                    <Eye className="w-4 h-4" />
-                    View Route
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Vehicle & Driver Info */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-foreground font-medium">
-                    <Car className="w-5 h-5 text-primary" />
-                    Vehicle & Driver
-                  </div>
-                  <div className="space-y-3 bg-muted/30 p-4 rounded-lg">
-                    <div className="grid grid-cols-2 gap-2">
-                      <span className="text-sm text-muted-foreground">Cab Name:</span>
-                      <span className="text-sm font-medium text-foreground">{route.cabName}</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <span className="text-sm text-muted-foreground">Vendor Code:</span>
-                      <span className="text-sm font-medium text-foreground">{route.vendorCode}</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <span className="text-sm text-muted-foreground">Vehicle:</span>
-                      <span className="text-sm font-medium text-foreground">{route.vehicleNumber}</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <span className="text-sm text-muted-foreground">Driver:</span>
-                      <span className="text-sm font-medium text-foreground">{route.driverName}</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <span className="text-sm text-muted-foreground">Contact:</span>
-                      <span className="text-sm font-medium text-foreground">{route.driverPhone}</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <span className="text-sm text-muted-foreground">Capacity:</span>
-                      <span className="text-sm font-medium text-foreground">{route.vehicleCapacity} seats</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Route Details */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-foreground font-medium">
-                    <MapPin className="w-5 h-5 text-primary" />
-                    Route Details
-                  </div>
-                  <div className="space-y-4">
-                    <div className="bg-muted/30 p-4 rounded-lg">
-                      <div className="mb-3">
-                        <span className="text-sm font-medium text-foreground">Pickup Points:</span>
-                        <ul className="mt-2 space-y-2">
-                          {route.pickupPoints.map((point, index) => (
-                            <li key={index} className="flex items-center gap-2 text-sm">
-                              <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
-                              <span className="text-muted-foreground">{point}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div className="pt-3 border-t border-border/50">
-                        <span className="text-sm font-medium text-foreground">Drop Point:</span>
-                        <p className="text-sm text-muted-foreground mt-1">{route.dropPoint}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-4 text-sm bg-muted/30 p-3 rounded-lg">
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-4 h-4 text-primary" />
-                        <span className="font-medium">{route.departureTime}</span>
-                      </div>
-                      <span className="text-muted-foreground">Duration: {route.estimatedDuration}</span>
-                      <span className="text-muted-foreground">Distance: {route.totalDistance}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Assigned Employees */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-foreground font-medium">
-                      <Users className="w-5 h-5 text-primary" />
-                      Assigned Employees ({route.assignedEmployees})
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setEditingRoute(route)}
-                      className="gap-2"
-                    >
-                      <Edit className="w-4 h-4" />
-                      Edit
-                    </Button>
-                  </div>
-                  <div className="bg-muted/30 p-4 rounded-lg">
-                    <div className="space-y-2 max-h-56 overflow-y-auto">
-                      {route.employees.map((employee) => (
-                        <div key={employee.id} className="flex items-center justify-between p-3 bg-background rounded-md border border-border/50">
-                          <div>
-                            <div className="text-sm font-medium text-foreground">{employee.name}</div>
-                            <div className="text-xs text-muted-foreground">{employee.empId}</div>
-                          </div>
-                          <div className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-                            {employee.pickup}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <RouteCard 
+            key={route.id} 
+            route={route}
+            onViewRoute={setSelectedRoute}
+            onEditRoute={setEditingRoute}
+          />
         ))}
       </div>
 
