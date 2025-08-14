@@ -345,32 +345,68 @@ const EditRouteDialog: React.FC<EditRouteDialogProps> = ({ route, open, onClose,
 
           {/* Right Column - Employee Management */}
           <div className="space-y-6">
-            {/* Seat Capacity Overview */}
+            {/* Passenger Management */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center justify-between">
-                  <span>Seat Management</span>
-                  <Badge variant={availableSeats > 0 ? "secondary" : "destructive"}>
-                    {editedRoute.employees.length}/{editedRoute.vehicleCapacity} Occupied
-                  </Badge>
+                  <span>Passenger Management ({editedRoute.employees.length}/{editedRoute.vehicleCapacity})</span>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={availableSeats > 0 ? "secondary" : "destructive"}>
+                      {availableSeats} seats available
+                    </Badge>
+                    {availableSeats > 0 && (
+                      <Button 
+                        onClick={() => setShowAddEmployee(!showAddEmployee)}
+                        size="sm"
+                        className="gap-2"
+                      >
+                        <UserPlus className="w-4 h-4" />
+                        Add Employee
+                      </Button>
+                    )}
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center gap-4">
-                  <div className="flex-1">
-                    <div className="text-sm text-muted-foreground mb-2">Available Seats</div>
-                    <div className="text-2xl font-bold text-primary">{availableSeats}</div>
+                {editedRoute.employees.length > 0 ? (
+                  <div className="border border-border rounded-lg overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-muted/50">
+                          <TableHead className="text-xs">Name</TableHead>
+                          <TableHead className="text-xs">ID</TableHead>
+                          <TableHead className="text-xs">Pickup</TableHead>
+                          <TableHead className="text-xs w-12"></TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {editedRoute.employees.map((employee) => (
+                          <TableRow key={employee.id}>
+                            <TableCell className="text-sm font-medium">{employee.name}</TableCell>
+                            <TableCell className="text-sm text-muted-foreground">{employee.empId}</TableCell>
+                            <TableCell className="text-sm text-muted-foreground">{employee.pickup}</TableCell>
+                            <TableCell>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeEmployee(employee.id)}
+                                className="h-6 w-6 p-0 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   </div>
-                  {availableSeats > 0 && (
-                    <Button 
-                      onClick={() => setShowAddEmployee(!showAddEmployee)}
-                      className="gap-2"
-                    >
-                      <UserPlus className="w-4 h-4" />
-                      Add Employee
-                    </Button>
-                  )}
-                </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                    <p>No employees assigned to this route</p>
+                    <p className="text-xs mt-1">{editedRoute.vehicleCapacity} seats available</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -453,54 +489,6 @@ const EditRouteDialog: React.FC<EditRouteDialogProps> = ({ route, open, onClose,
               </Card>
             )}
 
-            {/* Current Employees */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  Current Passengers ({editedRoute.employees.length})
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {editedRoute.employees.length > 0 ? (
-                  <div className="border border-border rounded-lg overflow-hidden">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="bg-muted/50">
-                          <TableHead className="text-xs">Name</TableHead>
-                          <TableHead className="text-xs">ID</TableHead>
-                          <TableHead className="text-xs">Pickup</TableHead>
-                          <TableHead className="text-xs w-12"></TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {editedRoute.employees.map((employee) => (
-                          <TableRow key={employee.id}>
-                            <TableCell className="text-sm font-medium">{employee.name}</TableCell>
-                            <TableCell className="text-sm text-muted-foreground">{employee.empId}</TableCell>
-                            <TableCell className="text-sm text-muted-foreground">{employee.pickup}</TableCell>
-                            <TableCell>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => removeEmployee(employee.id)}
-                                className="h-6 w-6 p-0 text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                              >
-                                <X className="h-3 w-3" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                    <p>No employees assigned to this route</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
           </div>
         </div>
 
