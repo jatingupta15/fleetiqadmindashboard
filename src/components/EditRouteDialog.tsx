@@ -345,6 +345,7 @@ const EditRouteDialog: React.FC<EditRouteDialogProps> = ({ route, open, onClose,
 
           {/* Right Column - Employee Management */}
           <div className="space-y-6">
+
             {/* Passenger Management */}
             <Card>
               <CardHeader>
@@ -358,16 +359,82 @@ const EditRouteDialog: React.FC<EditRouteDialogProps> = ({ route, open, onClose,
                       <Button 
                         onClick={() => setShowAddEmployee(!showAddEmployee)}
                         size="sm"
+                        variant={showAddEmployee ? "secondary" : "default"}
                         className="gap-2"
                       >
                         <UserPlus className="w-4 h-4" />
-                        Add Employee
+                        {showAddEmployee ? "Cancel" : "Add Employee"}
                       </Button>
                     )}
                   </div>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
+                {/* Add Employee Section - Inline */}
+                {showAddEmployee && availableSeats > 0 && (
+                  <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-dashed">
+                    <div className="text-sm font-medium text-muted-foreground">Add New Passenger</div>
+                    
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Input
+                        placeholder="Search employees by name, ID, or department..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                    
+                    <div className="max-h-40 overflow-y-auto border border-border rounded-lg bg-background">
+                      {filteredAvailableEmployees.length > 0 ? (
+                        filteredAvailableEmployees.slice(0, 5).map((employee) => (
+                          <div 
+                            key={employee.id} 
+                            className={`p-3 border-b border-border last:border-b-0 cursor-pointer hover:bg-muted/50 ${
+                              selectedEmployeeId === employee.id ? 'bg-primary/10' : ''
+                            }`}
+                            onClick={() => setSelectedEmployeeId(employee.id)}
+                          >
+                            <div className="text-sm font-medium">{employee.name}</div>
+                            <div className="text-xs text-muted-foreground">{employee.empId} • {employee.department}</div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="p-3 text-sm text-muted-foreground text-center">
+                          No employees found
+                        </div>
+                      )}
+                    </div>
+
+                    {selectedEmployeeId && (
+                      <div className="space-y-3">
+                        <div>
+                          <Label>Select Pickup Point</Label>
+                          <Select value={selectedPickupPoint} onValueChange={setSelectedPickupPoint}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Choose pickup point" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {editedRoute.pickupPoints.map((point, index) => (
+                                <SelectItem key={index} value={point}>{point}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <Button 
+                          onClick={addEmployee} 
+                          disabled={!selectedPickupPoint}
+                          className="w-full"
+                        >
+                          Add to Route
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Current Passengers Table */}
                 {editedRoute.employees.length > 0 ? (
                   <div className="border border-border rounded-lg overflow-hidden">
                     <Table>
@@ -409,85 +476,6 @@ const EditRouteDialog: React.FC<EditRouteDialogProps> = ({ route, open, onClose,
                 )}
               </CardContent>
             </Card>
-
-            {/* Add Employee Section */}
-            {showAddEmployee && availableSeats > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Add Employee to Route</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <Input
-                      placeholder="Search employees by name, ID, or department..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                  
-                  <div className="max-h-40 overflow-y-auto border border-border rounded-lg">
-                    {filteredAvailableEmployees.length > 0 ? (
-                      filteredAvailableEmployees.slice(0, 5).map((employee) => (
-                        <div 
-                          key={employee.id} 
-                          className={`p-3 border-b border-border last:border-b-0 cursor-pointer hover:bg-muted/50 ${
-                            selectedEmployeeId === employee.id ? 'bg-primary/10' : ''
-                          }`}
-                          onClick={() => setSelectedEmployeeId(employee.id)}
-                        >
-                          <div className="text-sm font-medium">{employee.name}</div>
-                          <div className="text-xs text-muted-foreground">{employee.empId} • {employee.department}</div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="p-3 text-sm text-muted-foreground text-center">
-                        No employees found
-                      </div>
-                    )}
-                  </div>
-
-                  {selectedEmployeeId && (
-                    <div className="space-y-3">
-                      <div>
-                        <Label>Select Pickup Point</Label>
-                        <Select value={selectedPickupPoint} onValueChange={setSelectedPickupPoint}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Choose pickup point" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {editedRoute.pickupPoints.map((point, index) => (
-                              <SelectItem key={index} value={point}>{point}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div className="flex gap-2">
-                        <Button 
-                          onClick={addEmployee} 
-                          disabled={!selectedPickupPoint}
-                          className="flex-1"
-                        >
-                          Add to Route
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          onClick={() => {
-                            setSelectedEmployeeId(null);
-                            setSelectedPickupPoint('');
-                            setShowAddEmployee(false);
-                          }}
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
 
           </div>
         </div>
