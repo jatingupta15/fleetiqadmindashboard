@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,9 @@ import {
   Car,
   Users,
   Eye,
-  Edit
+  Edit,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
@@ -47,6 +49,7 @@ interface RouteCardProps {
 }
 
 const RouteCard: React.FC<RouteCardProps> = ({ route, onViewRoute, onEditRoute }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
   const pickupLocation = route.pickupPoints[0] || 'Multiple Locations';
   const dropLocation = route.dropPoint;
 
@@ -71,6 +74,15 @@ const RouteCard: React.FC<RouteCardProps> = ({ route, onViewRoute, onEditRoute }
           </div>
           <div className="flex items-center gap-3">
             <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="gap-2 text-muted-foreground hover:text-foreground"
+            >
+              {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              {isExpanded ? 'Collapse' : 'Expand'}
+            </Button>
+            <Button
               variant="outline"
               size="sm"
               onClick={() => onViewRoute(route)}
@@ -92,110 +104,112 @@ const RouteCard: React.FC<RouteCardProps> = ({ route, onViewRoute, onEditRoute }
         </div>
       </CardHeader>
 
-      <CardContent className="p-6">
-        {/* Route Info Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="space-y-1">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Route ID</span>
-            <p className="text-sm font-semibold text-foreground">RT-{String(route.id).padStart(3, '0')}</p>
+      {isExpanded && (
+        <CardContent className="p-6 animate-accordion-down">
+          {/* Route Info Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div className="space-y-1">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Route ID</span>
+              <p className="text-sm font-semibold text-foreground">RT-{String(route.id).padStart(3, '0')}</p>
+            </div>
+            
+            <div className="space-y-1">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Location</span>
+              <p className="text-sm font-semibold text-foreground">
+                {pickupLocation.length > 15 ? pickupLocation.substring(0, 15) + '...' : pickupLocation} → {dropLocation.length > 15 ? dropLocation.substring(0, 15) + '...' : dropLocation}
+              </p>
+            </div>
+            
+            <div className="space-y-1">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Vendor ID</span>
+              <p className="text-sm font-semibold text-foreground">{route.vendorCode}</p>
+            </div>
+            
+            <div className="space-y-1">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Passengers Travelling</span>
+              <p className="text-sm font-semibold text-foreground">{route.assignedEmployees}/{route.vehicleCapacity}</p>
+            </div>
           </div>
-          
-          <div className="space-y-1">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Location</span>
-            <p className="text-sm font-semibold text-foreground">
-              {pickupLocation.length > 15 ? pickupLocation.substring(0, 15) + '...' : pickupLocation} → {dropLocation.length > 15 ? dropLocation.substring(0, 15) + '...' : dropLocation}
-            </p>
-          </div>
-          
-          <div className="space-y-1">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Vendor ID</span>
-            <p className="text-sm font-semibold text-foreground">{route.vendorCode}</p>
-          </div>
-          
-          <div className="space-y-1">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Passengers Travelling</span>
-            <p className="text-sm font-semibold text-foreground">{route.assignedEmployees}/{route.vehicleCapacity}</p>
-          </div>
-        </div>
 
-        {/* Vehicle & Driver Details */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 bg-muted/30 rounded-lg">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-foreground font-medium">
-              <Car className="w-4 h-4 text-primary" />
-              <span className="text-sm">Vehicle Details</span>
+          {/* Vehicle & Driver Details */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 bg-muted/30 rounded-lg">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-foreground font-medium">
+                <Car className="w-4 h-4 text-primary" />
+                <span className="text-sm">Vehicle Details</span>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground">Cab: <span className="text-foreground font-medium">{route.cabName}</span></p>
+                <p className="text-xs text-muted-foreground">Number: <span className="text-foreground font-medium">{route.vehicleNumber}</span></p>
+              </div>
             </div>
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Cab: <span className="text-foreground font-medium">{route.cabName}</span></p>
-              <p className="text-xs text-muted-foreground">Number: <span className="text-foreground font-medium">{route.vehicleNumber}</span></p>
+            
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-foreground font-medium">
+                <User className="w-4 h-4 text-primary" />
+                <span className="text-sm">Driver Details</span>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground">Name: <span className="text-foreground font-medium">{route.driverName}</span></p>
+                <p className="text-xs text-muted-foreground">Phone: <span className="text-foreground font-medium">{route.driverPhone}</span></p>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-foreground font-medium">
+                <Clock className="w-4 h-4 text-primary" />
+                <span className="text-sm">Schedule</span>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground">Departure: <span className="text-foreground font-medium">{route.departureTime}</span></p>
+                <p className="text-xs text-muted-foreground">Duration: <span className="text-foreground font-medium">{route.estimatedDuration}</span></p>
+              </div>
             </div>
           </div>
-          
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-foreground font-medium">
-              <User className="w-4 h-4 text-primary" />
-              <span className="text-sm">Driver Details</span>
-            </div>
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Name: <span className="text-foreground font-medium">{route.driverName}</span></p>
-              <p className="text-xs text-muted-foreground">Phone: <span className="text-foreground font-medium">{route.driverPhone}</span></p>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-foreground font-medium">
-              <Clock className="w-4 h-4 text-primary" />
-              <span className="text-sm">Schedule</span>
-            </div>
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Departure: <span className="text-foreground font-medium">{route.departureTime}</span></p>
-              <p className="text-xs text-muted-foreground">Duration: <span className="text-foreground font-medium">{route.estimatedDuration}</span></p>
-            </div>
-          </div>
-        </div>
 
-        {/* Employee Table */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-foreground font-medium">
-              <Users className="w-5 h-5 text-primary" />
-              Employee Details ({route.assignedEmployees} passengers)
+          {/* Employee Table */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-foreground font-medium">
+                <Users className="w-5 h-5 text-primary" />
+                Employee Details ({route.assignedEmployees} passengers)
+              </div>
+              <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
+                {route.assignedEmployees}/{route.vehicleCapacity} seats
+              </Badge>
             </div>
-            <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
-              {route.assignedEmployees}/{route.vehicleCapacity} seats
-            </Badge>
-          </div>
-          
-          <div className="border border-border/50 rounded-lg overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/50">
-                  <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">S.No</TableHead>
-                  <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Employee Name</TableHead>
-                  <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Employee ID</TableHead>
-                  <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Pickup Location</TableHead>
-                  <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {route.employees.map((employee, index) => (
-                  <TableRow key={employee.id} className="border-border/50">
-                    <TableCell className="text-sm font-medium text-foreground">{index + 1}</TableCell>
-                    <TableCell className="text-sm font-medium text-foreground">{employee.name}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{employee.empId}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{employee.pickup}</TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" className="text-xs bg-green-100 text-green-800 border-green-200">
-                        Confirmed
-                      </Badge>
-                    </TableCell>
+            
+            <div className="border border-border/50 rounded-lg overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">S.No</TableHead>
+                    <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Employee Name</TableHead>
+                    <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Employee ID</TableHead>
+                    <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Pickup Location</TableHead>
+                    <TableHead className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Status</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {route.employees.map((employee, index) => (
+                    <TableRow key={employee.id} className="border-border/50">
+                      <TableCell className="text-sm font-medium text-foreground">{index + 1}</TableCell>
+                      <TableCell className="text-sm font-medium text-foreground">{employee.name}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{employee.empId}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{employee.pickup}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className="text-xs bg-green-100 text-green-800 border-green-200">
+                          Confirmed
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
-        </div>
-      </CardContent>
+        </CardContent>
+      )}
     </Card>
   );
 };
