@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Search, ChevronDown, ChevronUp } from 'lucide-react';
 import RouteMapView from '@/components/RouteMapView';
 import EditRouteDialog from '@/components/EditRouteDialog';
 import RouteCard from '@/components/RouteCard';
@@ -14,6 +15,7 @@ const Routing = () => {
   const [timeFilter, setTimeFilter] = useState('today');
   const [selectedRoute, setSelectedRoute] = useState<any>(null);
   const [editingRoute, setEditingRoute] = useState<any>(null);
+  const [allCollapsed, setAllCollapsed] = useState(false);
 
   const [routes, setRoutes] = useState([
     {
@@ -118,7 +120,16 @@ const Routing = () => {
           <h1 className="text-2xl font-bold text-gray-900">Smart Routing</h1>
           <p className="text-gray-600">View optimized route assignments and vehicle details</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setAllCollapsed(!allCollapsed)}
+            className="gap-2"
+          >
+            {allCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+            {allCollapsed ? 'Expand All' : 'Collapse All'}
+          </Button>
           <Badge variant="secondary" className="bg-blue-100 text-blue-800">
             {routes.length} Active Routes
           </Badge>
@@ -174,6 +185,7 @@ const Routing = () => {
             route={route}
             onViewRoute={setSelectedRoute}
             onEditRoute={setEditingRoute}
+            collapsed={allCollapsed}
           />
         ))}
       </div>
