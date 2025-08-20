@@ -15,6 +15,7 @@ import {
   ChevronUp
 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import VehicleTypeIcon from '@/components/VehicleTypeIcon';
 
 interface Employee {
   id: number;
@@ -28,6 +29,7 @@ interface RouteData {
   routeName: string;
   vehicleNumber: string;
   cabName: string;
+  vehicleType: string;
   vendorCode: string;
   driverName: string;
   driverPhone: string;
@@ -64,11 +66,11 @@ const RouteCard: React.FC<RouteCardProps> = ({ route, onViewRoute, onEditRoute, 
       {/* Route Header */}
       <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 px-6 py-4 border-b border-border/50">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-              <Route className="w-6 h-6 text-primary" />
-            </div>
-            <div>
+          <div className="flex items-center gap-6">
+            {/* Vehicle Type Visual */}
+            <VehicleTypeIcon vehicleType={route.vehicleType} />
+            
+            <div className="flex-1">
               <h3 className="text-lg font-semibold text-foreground">Route #{route.id}</h3>
               <div className="flex items-center gap-3 mt-1">
                 <span className="text-sm text-muted-foreground flex items-center gap-1">
