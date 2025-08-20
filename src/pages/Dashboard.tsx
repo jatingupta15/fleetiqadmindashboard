@@ -1,324 +1,134 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format } from 'date-fns';
-import { 
-  Users, 
-  Car, 
-  Calendar as CalendarIcon, 
-  AlertTriangle,
-  TrendingUp,
-  Clock,
-  MapPin,
-  Phone,
-  Route,
-  BarChart3,
-  Shield,
-  CheckCircle,
-  XCircle
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+import SmartPromptInterface from '@/components/SmartPromptInterface';
+import RouteQueryProcessor from '@/components/RouteQueryProcessor';
+import DashboardStats from '@/components/DashboardStats';
 
 const Dashboard = () => {
-  const [dateFilter, setDateFilter] = useState('today');
-  const [customDate, setCustomDate] = useState<Date>();
+  const [currentQuery, setCurrentQuery] = useState('');
+  const [queryResults, setQueryResults] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const metrics = [
-    { title: 'Total Rides Today', value: '127', change: '+12%', icon: Car, color: 'text-blue-600' },
-    { title: 'Active Employees', value: '284', change: '+3%', icon: Users, color: 'text-green-600' },
-    { title: 'Active Routes', value: '15', change: '+2', icon: Route, color: 'text-orange-600' },
-    { title: 'SOS Alerts', value: '1', change: 'Active', icon: AlertTriangle, color: 'text-red-600' },
+  // Mock route data for demonstration
+  const mockRoutes = [
+    {
+      id: 1,
+      routeName: 'Noida Sector 62 - Gurgaon Express',
+      from: 'Noida Sector 62',
+      to: 'DLF Cyber City, Gurgaon',
+      departureTime: '08:30 AM',
+      duration: '45 mins',
+      distance: '28 km',
+      vehicleType: 'SUV',
+      vehicleNumber: 'DL-01-AB-1234',
+      driverName: 'Rajesh Kumar',
+      availableSeats: 1,
+      totalSeats: 4,
+      status: 'active' as const,
+      confidence: 95
+    },
+    {
+      id: 2,
+      routeName: 'Whitefield - Electronic City Route',
+      from: 'Whitefield IT Park',
+      to: 'Electronic City Phase 1',
+      departureTime: '09:00 AM',
+      duration: '55 mins',
+      distance: '32 km',
+      vehicleType: 'Compact SUV',
+      vehicleNumber: 'KA-05-CD-5678',
+      driverName: 'Suresh Reddy',
+      availableSeats: 0,
+      totalSeats: 4,
+      status: 'active' as const,
+      confidence: 88
+    },
+    {
+      id: 3,
+      routeName: 'Andheri - BKC Business Route',
+      from: 'Andheri Station',
+      to: 'Bandra Kurla Complex',
+      departureTime: '08:45 AM',
+      duration: '40 mins',
+      distance: '18 km',
+      vehicleType: 'Sedan',
+      vehicleNumber: 'MH-12-EF-9012',
+      driverName: 'Ramesh Patil',
+      availableSeats: 1,
+      totalSeats: 4,
+      status: 'scheduled' as const,
+      confidence: 92
+    }
   ];
 
-  // Top cancellation reasons for smaller cards
-  const topCancellationReasons = [
-    { reason: 'Work from Home', count: 18, percentage: 32, trend: '+5%', color: 'text-blue-600' },
-    { reason: 'Illness', count: 12, percentage: 21, trend: '-2%', color: 'text-green-600' },
-    { reason: 'Personal Emergency', count: 9, percentage: 16, trend: '+1%', color: 'text-orange-600' },
-    { reason: 'Meeting Cancelled', count: 8, percentage: 14, trend: '-3%', color: 'text-purple-600' },
-  ];
-
-  const recentActivity = [
-    { 
-      id: 1, 
-      type: 'Route Assignment', 
-      employee: 'John Doe', 
-      department: 'IT', 
-      time: '2 mins ago', 
-      status: 'completed',
-      details: 'Auto-assigned to Route A-12',
-      priority: 'normal'
-    },
-    { 
-      id: 2, 
-      type: 'Emergency Ride', 
-      employee: 'Sarah Smith', 
-      department: 'HR', 
-      time: '5 mins ago', 
-      status: 'active',
-      details: 'Medical emergency - Priority dispatch',
-      priority: 'high'
-    },
-    { 
-      id: 3, 
-      type: 'Route Completion', 
-      employee: 'Mike Johnson', 
-      department: 'Finance', 
-      time: '8 mins ago', 
-      status: 'completed',
-      details: 'Evening route completed on time',
-      priority: 'normal'
-    },
-    { 
-      id: 4, 
-      type: 'SOS Alert', 
-      employee: 'Sarah Chen', 
-      department: 'Finance', 
-      time: '12 mins ago', 
-      status: 'resolved',
-      details: 'Vehicle breakdown - Backup dispatched',
-      priority: 'high'
-    },
-    { 
-      id: 5, 
-      type: 'Ride Cancellation', 
-      employee: 'Alex Johnson', 
-      department: 'Marketing', 
-      time: '15 mins ago', 
-      status: 'cancelled',
-      details: 'Work from home - 30 min notice',
-      priority: 'low'
-    },
-    { 
-      id: 6, 
-      type: 'Route Optimization', 
-      employee: 'System Auto', 
-      department: 'System', 
-      time: '18 mins ago', 
-      status: 'completed',
-      details: 'Route B-7 optimized - 15% time saved',
-      priority: 'normal'
-    },
-  ];
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'bg-blue-100 text-blue-800';
-      case 'approved': return 'bg-green-100 text-green-800';
-      case 'cancelled': return 'bg-red-100 text-red-800';
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'resolved': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
+  const processQuery = async (query: string) => {
+    setCurrentQuery(query);
+    setIsLoading(true);
+    
+    // Simulate API processing time
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Simple query processing logic (in real app, this would be AI-powered)
+    const lowerQuery = query.toLowerCase();
+    let filteredResults = [...mockRoutes];
+    
+    // Filter by locations
+    if (lowerQuery.includes('noida') || lowerQuery.includes('gurgaon')) {
+      filteredResults = filteredResults.filter(route => 
+        route.from.toLowerCase().includes('noida') || 
+        route.to.toLowerCase().includes('gurgaon')
+      );
+    } else if (lowerQuery.includes('whitefield') || lowerQuery.includes('electronic city')) {
+      filteredResults = filteredResults.filter(route => 
+        route.from.toLowerCase().includes('whitefield') || 
+        route.to.toLowerCase().includes('electronic city')
+      );
+    } else if (lowerQuery.includes('andheri') || lowerQuery.includes('bkc') || lowerQuery.includes('bandra')) {
+      filteredResults = filteredResults.filter(route => 
+        route.from.toLowerCase().includes('andheri') || 
+        route.to.toLowerCase().includes('bkc') || 
+        route.to.toLowerCase().includes('bandra')
+      );
     }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high': return 'border-l-red-500';
-      case 'normal': return 'border-l-blue-500';
-      case 'low': return 'border-l-gray-400';
-      default: return 'border-l-gray-400';
+    
+    // Filter by availability
+    if (lowerQuery.includes('available seats') || lowerQuery.includes('seats available')) {
+      filteredResults = filteredResults.filter(route => route.availableSeats > 0);
     }
-  };
-
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case 'Route Assignment': return <Route className="w-4 h-4" />;
-      case 'Emergency Ride': return <AlertTriangle className="w-4 h-4" />;
-      case 'Route Completion': return <CheckCircle className="w-4 h-4" />;
-      case 'SOS Alert': return <Shield className="w-4 h-4" />;
-      case 'Ride Cancellation': return <XCircle className="w-4 h-4" />;
-      case 'Route Optimization': return <BarChart3 className="w-4 h-4" />;
-      default: return <Clock className="w-4 h-4" />;
+    
+    // Filter by status
+    if (lowerQuery.includes('active') || lowerQuery.includes('right now')) {
+      filteredResults = filteredResults.filter(route => route.status === 'active');
     }
+    
+    setQueryResults(filteredResults);
+    setIsLoading(false);
   };
 
   return (
-    <div className="space-y-6">
-      {/* Date Filter */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
-        <div className="flex items-center space-x-4">
-          <Select value={dateFilter} onValueChange={setDateFilter}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Select period" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="today">Today</SelectItem>
-              <SelectItem value="week">This Week</SelectItem>
-              <SelectItem value="month">This Month</SelectItem>
-              <SelectItem value="custom">Custom</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          {dateFilter === 'custom' && (
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-40 justify-start text-left font-normal",
-                    !customDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {customDate ? format(customDate, "PPP") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={customDate}
-                  onSelect={setCustomDate}
-                  initialFocus
-                  className="p-3 pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
-          )}
-        </div>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="text-center space-y-2">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+          Intelligent Transport Dashboard
+        </h1>
+        <p className="text-muted-foreground">
+          Ask me anything about routes, get real-time insights, and manage your transport needs
+        </p>
       </div>
 
-      {/* Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {metrics.map((metric, index) => {
-          const Icon = metric.icon;
-          return (
-            <Card key={index} className="hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">
-                  {metric.title}
-                </CardTitle>
-                <Icon className={`w-5 h-5 ${metric.color}`} />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{metric.value}</div>
-                <div className="flex items-center text-sm text-gray-600 mt-1">
-                  <TrendingUp className="w-4 h-4 mr-1" />
-                  {metric.change}
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+      {/* Smart Prompt Interface */}
+      <SmartPromptInterface onQuery={processQuery} isLoading={isLoading} />
 
-      {/* Cancellation Reasons - 4 Cards (without heading) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {topCancellationReasons.map((reason, index) => (
-          <Card key={index} className="hover:shadow-lg transition-shadow">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-2">
-                <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                <div className={`text-xs font-medium ${reason.trend.startsWith('+') ? 'text-red-500' : reason.trend.startsWith('-') ? 'text-green-500' : 'text-gray-500'}`}>
-                  {reason.trend}
-                </div>
-              </div>
-              <div className="text-sm font-medium text-gray-900 mb-1">{reason.reason}</div>
-              <div className="text-2xl font-bold mb-1">{reason.count}</div>
-              <div className="text-xs text-gray-500">cases ({reason.percentage}%)</div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {/* Query Results */}
+      <RouteQueryProcessor 
+        query={currentQuery} 
+        results={queryResults} 
+        isLoading={isLoading} 
+      />
 
-      {/* Recent Activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Clock className="w-5 h-5 mr-2" />
-            Real-time Activity Feed
-          </CardTitle>
-          <CardDescription>
-            Live updates on routing activities, emergencies, and system events
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {recentActivity.map((activity) => (
-              <div key={activity.id} className={`flex items-start justify-between p-4 rounded-lg border-l-4 ${getPriorityColor(activity.priority)} bg-gray-50 hover:bg-gray-100 transition-colors`}>
-                <div className="flex items-start space-x-4">
-                  <div className="mt-1 text-gray-500">
-                    {getActivityIcon(activity.type)}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2">
-                      <span className="font-medium text-gray-900">{activity.type}</span>
-                      {activity.priority === 'high' && (
-                        <Badge variant="destructive" className="text-xs">HIGH</Badge>
-                      )}
-                    </div>
-                    <div className="text-sm text-gray-600 mt-1">
-                      {activity.employee} • {activity.department}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      {activity.details}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Badge className={getStatusColor(activity.status)} variant="outline">
-                    {activity.status}
-                  </Badge>
-                  <span className="text-sm text-gray-500 whitespace-nowrap">{activity.time}</span>
-                  {(activity.status === 'active' || activity.priority === 'high') && (
-                    <div className="flex space-x-1">
-                      <Button size="sm" variant="outline">
-                        <MapPin className="w-3 h-3" />
-                      </Button>
-                      <Button size="sm" variant="outline">
-                        <Phone className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Simplified Stats Grid - Only Performance Metrics */}
-      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-        {/* Today's Performance - Updated without fuel efficiency */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Performance Metrics</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">On-time Rides</span>
-                <span className="text-sm font-bold text-green-600">94.2%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-green-600 h-2 rounded-full w-[94%]"></div>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Route Efficiency</span>
-                <span className="text-sm font-bold text-blue-600">87.5%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-blue-600 h-2 rounded-full w-[87%]"></div>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Employee Satisfaction</span>
-                <span className="text-sm font-bold text-purple-600">4.6/5</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-purple-600 h-2 rounded-full w-[92%]"></div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Dashboard Stats */}
+      <DashboardStats />
     </div>
   );
 };
